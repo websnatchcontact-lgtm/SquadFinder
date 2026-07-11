@@ -45,18 +45,18 @@ export function AnnouncementModal() {
         handleClose();
       }
     }}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader className="gap-2">
-          <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
-            <Megaphone className="w-6 h-6 text-primary" />
-            📢 Capstone Registration Reminder
+      <DialogContent className="sm:max-w-[500px] w-[95vw] sm:w-full flex flex-col max-h-[90vh] md:max-h-[85vh] rounded-lg">
+        <DialogHeader className="gap-2 shrink-0">
+          <DialogTitle className="flex items-center gap-2 text-xl font-bold tracking-tight pr-6">
+            <Megaphone className="w-6 h-6 text-primary shrink-0" />
+            <span>📢 Capstone Registration Reminder</span>
           </DialogTitle>
           <DialogDescription className="sr-only">
             Important announcement regarding the capstone project deadline.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4 text-sm leading-relaxed text-muted-foreground">
+        <div className="space-y-4 py-4 text-sm leading-relaxed text-muted-foreground overflow-y-auto min-h-0">
           <p>Dear GLS students,</p>
           <p>
             The college has announced that all Capstone Project groups and project ideas must be submitted through the official Google Form before <strong>14 July at 4:00 PM</strong>.
@@ -73,7 +73,7 @@ export function AnnouncementModal() {
           <p>We wish everyone the very best for their Capstone Project!</p>
         </div>
 
-        <div className="flex flex-col gap-4 pt-4 border-t">
+        <div className="flex flex-col gap-4 pt-4 border-t shrink-0">
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="dont-show-again" 
