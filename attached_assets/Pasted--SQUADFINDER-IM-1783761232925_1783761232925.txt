@@ -1,0 +1,714 @@
+# ==============================================================================
+# SQUADFINDER - IMPLEMENTATION SPECIFICATION (PART 2)
+# CONFLICT MANAGEMENT, REQUESTS, CONFIRMATIONS & DASHBOARD ENHANCEMENTS
+# ==============================================================================
+
+# IMPORTANT
+
+Everything in this document extends the existing application.
+
+Do NOT redesign existing pages.
+
+Do NOT replace components.
+
+Integrate the following features into the existing architecture.
+
+The UI should feel as though these features always existed.
+
+==============================================================================
+
+# APPLICATION PHILOSOPHY
+
+The application should NEVER decide who is right.
+
+The application should NEVER decide which group is correct.
+
+The application should NEVER automatically remove students.
+
+Instead,
+
+the application should simply collect information,
+
+detect conflicts,
+
+and clearly visualize them.
+
+The final decision always belongs to the students.
+
+==============================================================================
+
+# GROUP CONFIRMATION SYSTEM
+
+Introduce a confirmation system.
+
+Purpose:
+
+Allow students to confirm that they actually belong to a group.
+
+This increases confidence in group accuracy.
+
+--------------------------------------------------
+
+Creator
+
+When a group is created,
+
+the creator is automatically marked as:
+
+Confirmed
+
+Reason:
+
+The creator intentionally created the group.
+
+--------------------------------------------------
+
+Other Members
+
+Every other member starts as:
+
+Unconfirmed
+
+They remain unconfirmed until they manually confirm.
+
+==============================================================================
+
+# CONFIRMATION FLOW
+
+When any student searches themselves,
+
+and they appear inside a group,
+
+display a prominent action.
+
+Button:
+
+"I Confirm I'm In This Group"
+
+Clicking this should:
+
+Mark the student as Confirmed.
+
+Update dashboard statistics immediately.
+
+Update group progress immediately.
+
+Persist inside Local Storage.
+
+Show success toast.
+
+Example
+
+✓ You are now confirmed in Group 8.
+
+==============================================================================
+
+# CONFIRMATION DISPLAY
+
+Every group card should display:
+
+Members
+
+3 / 4
+
+Confirmed
+
+2 / 3
+
+Example
+
+Members
+
+4 / 4
+
+Confirmed
+
+3 / 4
+
+Use progress indicators.
+
+Do not display only numbers.
+
+==============================================================================
+
+# CONFIRMATION BADGES
+
+Every student card should display
+
+Confirmed
+
+Green Badge
+
+Unconfirmed
+
+Orange Badge
+
+Badges should be consistent throughout the application.
+
+==============================================================================
+
+# REQUEST TO JOIN
+
+When a group has available seats,
+
+display
+
+Request To Join
+
+Button.
+
+If group is FULL,
+
+hide the button.
+
+==============================================================================
+
+# REQUEST WORKFLOW
+
+When clicking
+
+Request To Join
+
+Show modal.
+
+Ask:
+
+Name
+
+Enrollment Number
+
+Division
+
+Specialization
+
+Optional Note
+
+Example
+
+"I discussed with your group yesterday."
+
+Validate:
+
+Enrollment Number
+
+Division
+
+Specialization
+
+Duplicate Membership
+
+If valid,
+
+create a Pending Request.
+
+Never automatically join the student.
+
+==============================================================================
+
+# REQUEST STORAGE
+
+Every request should store:
+
+Student Name
+
+Enrollment Number
+
+Division
+
+Specialization
+
+Request Note
+
+Requested Date
+
+Requested Time
+
+Timestamp
+
+Status
+
+Pending
+
+Creator Name
+
+(optional if already known)
+
+Persist inside Local Storage.
+
+==============================================================================
+
+# REQUEST MANAGEMENT
+
+Each group contains a new section.
+
+Requests
+
+This section displays
+
+Pending Join Requests.
+
+Every request card shows:
+
+Student Name
+
+Enrollment Number
+
+Division
+
+Specialization
+
+Requested At
+
+Optional Note
+
+Pending Badge
+
+No Accept button.
+
+No Reject button.
+
+Students communicate outside the application.
+
+==============================================================================
+
+# GROUP STATUS
+
+Every group should always calculate
+
+Current Members
+
+Maximum Members
+
+Confirmed Members
+
+Pending Requests
+
+Available Seats
+
+Conflict Count
+
+Last Updated
+
+Created Date
+
+Created By
+
+All values should be dynamic.
+
+==============================================================================
+
+# GROUP CARD
+
+Upgrade every group card.
+
+Every card should display:
+
+Group Number
+
+Members
+
+Confirmed
+
+Available Seats
+
+Conflict Status
+
+Pending Requests
+
+Created By
+
+Created Date
+
+Status Badge
+
+Progress Indicator
+
+Example
+
+----------------------------------
+
+Group 12
+
+Members
+
+3 / 4
+
+Confirmed
+
+2 / 3
+
+Seats Left
+
+1
+
+Requests
+
+2
+
+Conflict
+
+No
+
+Created By
+
+Naman
+
+Created
+
+11 July 2026
+
+----------------------------------
+
+==============================================================================
+
+# GROUP DETAILS
+
+Expand the existing Group Details page.
+
+Include
+
+Group Summary
+
+Member List
+
+Confirmation Status
+
+Pending Requests
+
+Conflict Information
+
+Group Notes
+
+Creation Details
+
+Specialization Summary
+
+Division Summary
+
+Everything should be organized using cards.
+
+==============================================================================
+
+# GROUP NOTES
+
+Every group supports Notes.
+
+Notes are optional.
+
+Examples
+
+"We already finalized our topic."
+
+"We are looking for one CS student."
+
+"Frontend developer preferred."
+
+Display notes inside
+
+Group Details.
+
+Allow creator to edit notes later.
+
+Persist using Local Storage.
+
+==============================================================================
+
+# DUPLICATE DETECTION
+
+Whenever a student is added,
+
+immediately search every existing group.
+
+If Enrollment Number already exists elsewhere,
+
+show confirmation dialog.
+
+Example
+
+⚠ Conflict Detected
+
+Aryan Shah
+
+already belongs to
+
+Group 3
+
+Adding him to
+
+Group 8
+
+will create a visible conflict.
+
+Buttons
+
+Cancel
+
+Continue Anyway
+
+==============================================================================
+
+# CONFLICT CENTER
+
+Dashboard must contain
+
+Conflict Center.
+
+Purpose
+
+Provide one centralized place for every conflict.
+
+Never hide conflicts.
+
+Never silently resolve conflicts.
+
+==============================================================================
+
+# CONFLICT CARD
+
+Each conflict card should display
+
+Student Name
+
+Enrollment Number
+
+Specialization
+
+Division
+
+Conflict Severity
+
+Appears In
+
+Group 3
+
+Group 8
+
+Group 14
+
+Created By
+
+Creator Name
+
+Created At
+
+Timestamp
+
+Status
+
+Unresolved
+
+==============================================================================
+
+# CONFLICT SEVERITY
+
+Display
+
+🟢
+
+No Conflict
+
+🟠
+
+One Duplicate
+
+🔴
+
+Multiple Duplicates
+
+This makes the dashboard much easier to understand.
+
+==============================================================================
+
+# CONFLICT DETAILS
+
+Expanding a conflict should show
+
+Group Number
+
+Created By
+
+Created Date
+
+Members
+
+Confirmation Count
+
+Notes
+
+Creator Name
+
+Never expose personal contact information.
+
+==============================================================================
+
+# DASHBOARD
+
+Upgrade dashboard statistics.
+
+Display:
+
+Total Groups
+
+Total Students
+
+Confirmed Members
+
+Unconfirmed Members
+
+Pending Requests
+
+Open Seats
+
+Conflict Count
+
+CS Students
+
+AI/ML Students
+
+Division A
+
+Division B
+
+Average Group Size
+
+Largest Group
+
+Smallest Group
+
+Recently Created Groups
+
+Animate every statistic.
+
+==============================================================================
+
+# LIVE DASHBOARD
+
+Dashboard updates instantly when:
+
+Group Created
+
+Member Confirmed
+
+Request Submitted
+
+Conflict Created
+
+Note Updated
+
+No manual refresh.
+
+==============================================================================
+
+# GROUP HEALTH
+
+Introduce
+
+Group Health.
+
+Example
+
+🟢 Healthy
+
+All confirmed
+
+No conflicts
+
+🟡 Pending
+
+Waiting for confirmations
+
+🔴 Conflict
+
+Duplicate members detected
+
+Display health badge on every group card.
+
+==============================================================================
+
+# EMPTY STATES
+
+Never leave blank pages.
+
+Examples
+
+No Requests
+
+No Conflicts
+
+No Notes
+
+No Groups
+
+Display friendly illustrations.
+
+Professional empty-state messages.
+
+Call-to-action buttons where appropriate.
+
+==============================================================================
+
+# SUCCESS FEEDBACK
+
+Every successful action should provide feedback.
+
+Examples
+
+✓ Group created successfully
+
+✓ Member confirmed
+
+✓ Request submitted
+
+✓ Notes updated
+
+Use modern toast notifications.
+
+Never use browser alerts.
+
+==============================================================================
+
+# ERROR HANDLING
+
+Every validation failure should be explained.
+
+Examples
+
+Invalid enrollment number
+
+Student already exists in this group
+
+Mixed specialization not allowed
+
+Group already full
+
+Conflict warning
+
+Use inline validation and dialogs.
+
+Never display raw errors.
+
+==============================================================================
+
+# DATA SYNCHRONIZATION
+
+All dashboard statistics,
+
+group cards,
+
+conflict center,
+
+requests,
+
+and confirmations
+
+must remain synchronized.
+
+Whenever any value changes,
+
+the entire UI should update automatically.
+
+No stale data.
+
+==============================================================================
+
+# END OF PART 2

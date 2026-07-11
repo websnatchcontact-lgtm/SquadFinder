@@ -1,0 +1,574 @@
+# ==============================================================================
+# SQUADFINDER - IMPLEMENTATION SPECIFICATION (PART 1)
+# BUSINESS RULES, VALIDATIONS & CORE APPLICATION ENHANCEMENTS
+# ==============================================================================
+
+# IMPORTANT
+
+This is NOT a new project.
+
+This is NOT a redesign.
+
+This is NOT a rewrite.
+
+This project already exists.
+
+The application is already built with:
+
+• Existing pages
+• Existing routing
+• Existing dashboard
+• Existing search
+• Existing animations
+• Existing components
+• Existing branding
+• Existing design system
+
+Your task is ONLY to enhance the existing application.
+
+Maintain the existing architecture.
+
+Maintain the existing code style.
+
+Maintain the existing component structure.
+
+Maintain the existing UI/UX quality.
+
+Maintain the existing responsive design.
+
+Maintain all existing animations.
+
+Maintain all existing transitions.
+
+Maintain all existing styling.
+
+The user should feel that these new features were originally part of the application.
+
+Do NOT replace existing components unless absolutely necessary.
+
+Always extend existing functionality instead of rewriting it.
+
+==============================================================================
+
+# PRIMARY OBJECTIVE
+
+The original SquadFinder application only allows students to search and browse groups.
+
+The application must now evolve into a collaborative Capstone Group Coordination Platform.
+
+The application must still remain:
+
+• Frontend only
+
+• No Backend
+
+• No Authentication
+
+• No Database
+
+• No APIs
+
+Everything should continue working entirely using:
+
+• Static JSON
+
++
+
+• Browser Local Storage
+
+==============================================================================
+
+# CORE BUSINESS MODEL
+
+This application is NOT an official college management system.
+
+It is a student collaboration platform.
+
+The application does NOT decide which group is correct.
+
+The application only records and visualizes information entered by students.
+
+Whenever conflicting information exists,
+
+the application should clearly display the conflict,
+
+but should NEVER attempt to automatically resolve it.
+
+==============================================================================
+
+# SPECIALIZATION RULE
+
+This is a STRICT business rule.
+
+Only TWO specializations exist.
+
+1.
+
+CS
+
+2.
+
+AI/ML
+
+No other specialization should exist anywhere.
+
+Remove every reference to:
+
+• IT
+
+• AI-DS
+
+• CYEC
+
+• AIML (duplicate spellings)
+
+• Information Technology
+
+• Data Science
+
+• Any other branch
+
+The entire application must consistently use ONLY:
+
+CS
+
+AI/ML
+
+This includes:
+
+• Forms
+
+• Search
+
+• Filters
+
+• Statistics
+
+• Dashboard
+
+• Cards
+
+• Modals
+
+• Tables
+
+• Tags
+
+• Badges
+
+• Validation
+
+Everywhere.
+
+==============================================================================
+
+# GROUP VALIDATION RULE
+
+Students belonging to different specializations CANNOT belong to the same group.
+
+Examples
+
+CS
+CS
+CS
+
+✓ VALID
+
+AI/ML
+AI/ML
+AI/ML
+
+✓ VALID
+
+CS
+CS
+AI/ML
+
+✗ INVALID
+
+AI/ML
+CS
+
+✗ INVALID
+
+Whenever a user attempts to create this situation,
+
+prevent the action.
+
+Display a modern dialog explaining:
+
+"This group contains students from different specializations.
+
+According to Capstone grouping rules, students from different specializations cannot form the same team."
+
+The group should NOT be created until corrected.
+
+==============================================================================
+
+# DIVISION RULE
+
+The college contains two divisions.
+
+Division A
+
+Division B
+
+Unlike specialization,
+
+Division has NO restriction.
+
+The following combinations are valid:
+
+A + A
+
+A + B
+
+B + A
+
+B + B
+
+Division is informational only.
+
+Division should appear on:
+
+Student Card
+
+Search Result
+
+Group Details
+
+Dashboard
+
+Conflict Details
+
+Statistics
+
+==============================================================================
+
+# ENROLLMENT NUMBER
+
+Enrollment Number is the PRIMARY IDENTIFIER.
+
+This is extremely important.
+
+Never identify students using Name.
+
+Never identify students using Index.
+
+Never identify students using Array Position.
+
+Only Enrollment Number uniquely identifies a student.
+
+Enrollment Number validation:
+
+✓ Numeric only
+
+✓ Remove whitespace automatically
+
+✓ Reject alphabets
+
+✓ Reject symbols
+
+✓ Reject emojis
+
+✓ Reject punctuation
+
+No fixed length validation.
+
+Apply this validation everywhere:
+
+Search
+
+Create Group
+
+Add Member
+
+Join Request
+
+Conflict Detection
+
+Confirmation
+
+Future Features
+
+==============================================================================
+
+# STUDENT SEARCH
+
+The existing search experience must be upgraded.
+
+Searching should NOT mean
+
+"My Profile."
+
+Searching should mean
+
+"Search Any Student."
+
+Users should be able to search using:
+
+Enrollment Number
+
+OR
+
+Student Name
+
+Search should remain:
+
+Instant
+
+Responsive
+
+Animated
+
+Keyboard Accessible
+
+Autocomplete Enabled
+
+Highlighted Results
+
+Search results should display:
+
+Student Name
+
+Enrollment Number
+
+Division
+
+Specialization
+
+Current Group
+
+Group Status
+
+Total Members
+
+Available Seats
+
+Confirmation Status
+
+Conflict Status
+
+Group Notes (if available)
+
+==============================================================================
+
+# CREATE GROUP
+
+Introduce a completely new feature:
+
+Create Group
+
+Navigation
+
+Dashboard
+
+Home Page
+
+should all provide access.
+
+The Create Group workflow should be simple.
+
+STEP 1
+
+Ask only:
+
+Creator Name
+
+Do NOT ask for:
+
+Phone Number
+
+Email
+
+Address
+
+Personal Information
+
+STEP 2
+
+Automatically record:
+
+Created Date
+
+Created Time
+
+Generated Timestamp
+
+STEP 3
+
+Begin adding members.
+
+Each member requires:
+
+Student Name
+
+Enrollment Number
+
+Division
+
+Specialization
+
+Maximum Members
+
+4
+
+Minimum Members
+
+2
+
+==============================================================================
+
+# GROUP NUMBERING
+
+Do NOT use
+
+A01
+
+A02
+
+A03
+
+Automatically generate
+
+Group 1
+
+Group 2
+
+Group 3
+
+...
+
+The numbering should continue automatically.
+
+==============================================================================
+
+# MEMBER VALIDATION
+
+Every member added must pass validation.
+
+Validation includes:
+
+Enrollment Number exists
+
+Specialization valid
+
+Division valid
+
+No duplicate enrollment inside SAME group
+
+No empty name
+
+No empty enrollment
+
+If validation fails,
+
+display inline validation messages.
+
+Never use browser alerts.
+
+==============================================================================
+
+# DUPLICATE ENROLLMENT DETECTION
+
+Enrollment Number must never appear twice
+
+inside the SAME group.
+
+Example
+
+Aryan
+
+Aryan
+
+Group 7
+
+✗ INVALID
+
+Prevent saving.
+
+Display:
+
+"This student has already been added to this group."
+
+==============================================================================
+
+# CROSS GROUP DUPLICATES
+
+A student MAY appear in multiple different groups.
+
+This is allowed.
+
+However,
+
+doing so automatically creates a conflict.
+
+Whenever this happens,
+
+show a professional confirmation dialog.
+
+"This student already belongs to another registered group.
+
+Continuing will create a conflict that will be visible on the dashboard."
+
+Options
+
+Cancel
+
+Continue Anyway
+
+Never silently create conflicts.
+
+==============================================================================
+
+# GROUP CREATION
+
+Once validation passes,
+
+the group should immediately appear across the application.
+
+Dashboard
+
+Search
+
+Statistics
+
+Group Explorer
+
+Group Details
+
+Everything updates instantly.
+
+No page refresh required.
+
+==============================================================================
+
+# LOCAL STORAGE
+
+All newly created groups
+
+must be stored inside Local Storage.
+
+Never overwrite
+
+students.json
+
+Never modify original demo data.
+
+Instead,
+
+merge
+
+Original JSON
+
++
+
+Local Storage
+
+into one unified data source.
+
+The original JSON must always remain read-only.
+
+==============================================================================
+
+# END OF PART 1

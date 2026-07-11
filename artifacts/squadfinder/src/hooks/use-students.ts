@@ -1,20 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import {
-  getAvailableStudents,
-  getGroup,
-  loadStudents,
-  registerLookingForGroup,
-} from '@/services/student.service';
-import type { Group, Student } from '@/types';
+import { loadBaselineStudents, registerLookingForGroup } from '@/services/student.service';
+import type { RegisterLookingForGroupInput, Student } from '@/types';
 
-/** Full merged roster (base JSON + Local Storage additions). Re-reads on demand via `refresh`. */
+/** Full merged roster (demo JSON + Local Storage "looking for a group" additions). */
 export function useStudents(): { students: Student[]; isLoading: boolean; refresh: () => void } {
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refresh = useCallback(() => {
-    setStudents(loadStudents());
+    setStudents(loadBaselineStudents());
     setIsLoading(false);
   }, []);
 
@@ -26,36 +21,18 @@ export function useStudents(): { students: Student[]; isLoading: boolean; refres
 }
 
 /** Students currently marked as FREE (looking for a team). */
-export function useAvailableStudents(): { students: Student[]; isLoading: boolean; refresh: () => void } {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const refresh = useCallback(() => {
-    setStudents(getAvailableStudents());
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return { students, isLoading, refresh };
+export function useAvailableStudents(): {
+  students: Student[];
+  isLoading: boolean;
+  refresh: () => void;
+} {
+  const { students, isLoading, refresh } = useStudents();
+  return { students: students.filter((s) => s.status === 'FREE'), isLoading, refresh };
 }
 
-/** Derived Group data for a given group number (recomputes when the number changes). */
-export function useGroup(groupNumber: string | null | undefined): Group | undefined {
-  const [group, setGroup] = useState<Group | undefined>(undefined);
-
-  useEffect(() => {
-    setGroup(groupNumber ? getGroup(groupNumber) : undefined);
-  }, [groupNumber]);
-
-  return group;
-}
-
-/** Registers a student as looking for a group, then returns the created record. */
+/** Registers a student as looking for a group, returning the created record. */
 export function useRegisterLookingForGroup(): {
-  register: typeof registerLookingForGroup;
+  register: (input: RegisterLookingForGroupInput) => Student;
 } {
   return { register: registerLookingForGroup };
 }

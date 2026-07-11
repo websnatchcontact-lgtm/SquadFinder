@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { ROUTES } from "@/constants";
 import { cn } from "@/lib/utils";
 import { Users, Search, LayoutDashboard, Compass } from "lucide-react";
+import { ResetDemoDataDialog } from "@/components/reset-data-dialog";
 import { useEffect, useState } from "react";
 
 export function Navbar() {
@@ -90,6 +91,7 @@ export function Footer() {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <ResetDemoDataDialog />
           <Link href={ROUTES.about} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             About Project
           </Link>

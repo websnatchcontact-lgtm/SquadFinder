@@ -1,23 +1,26 @@
-import type { SpecializationCode, SpecializationInfo, StudentStatus } from '@/types';
+import type { DivisionCode, SpecializationCode, SpecializationInfo, StudentStatus } from '@/types';
 
-export const MAX_GROUP_MEMBERS = 5;
-export const MIN_GROUP_MEMBERS = 3;
+export const MAX_GROUP_MEMBERS = 4;
+export const MIN_GROUP_MEMBERS = 2;
 
+/** Only two specializations exist anywhere in the app. Strict business rule. */
 export const SPECIALIZATIONS: Record<SpecializationCode, SpecializationInfo> = {
-  CS: { code: 'CS', label: 'Computer Science' },
-  IT: { code: 'IT', label: 'Information Technology' },
-  AI: { code: 'AI', label: 'AI/ML' },
-  DS: { code: 'DS', label: 'Data Science' },
-  CY: { code: 'CY', label: 'Cybersecurity' },
-  EC: { code: 'EC', label: 'Electronics' },
+  CS: { code: 'CS', label: 'CS' },
+  AIML: { code: 'AIML', label: 'AI/ML' },
 };
 
 export const SPECIALIZATION_LIST: SpecializationInfo[] = Object.values(SPECIALIZATIONS);
 
+export const DIVISIONS: Record<DivisionCode, string> = {
+  A: 'Division A',
+  B: 'Division B',
+};
+
+export const DIVISION_LIST: DivisionCode[] = ['A', 'B'];
+
 export const STATUS_LABELS: Record<StudentStatus, string> = {
   GROUPED: 'Grouped',
   FREE: 'Looking For A Group',
-  MISMATCH: 'Mismatch',
 };
 
 export const ROUTES = {
@@ -30,4 +33,8 @@ export const ROUTES = {
 
 export const LOCAL_STORAGE_KEYS = {
   lookingForGroup: 'squadfinder:looking-for-group',
+  createdGroups: 'squadfinder:created-groups',
+  requests: 'squadfinder:join-requests',
+  confirmations: 'squadfinder:confirmations',
+  notes: 'squadfinder:group-notes',
 } as const;

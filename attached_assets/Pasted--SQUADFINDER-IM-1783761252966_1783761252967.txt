@@ -1,0 +1,643 @@
+# ==============================================================================
+# SQUADFINDER - IMPLEMENTATION SPECIFICATION (PART 3)
+# DATA ARCHITECTURE, EDGE CASES, DEVELOPMENT RULES & FINAL ACCEPTANCE CRITERIA
+# ==============================================================================
+
+# IMPORTANT
+
+This specification completes the implementation.
+
+Do NOT rebuild the project.
+
+Do NOT change the overall design language.
+
+Do NOT replace the current architecture.
+
+Do NOT remove existing features.
+
+Only extend the application while maintaining consistency with the existing codebase.
+
+The final application should feel like these features were originally designed as part of SquadFinder.
+
+==============================================================================
+DATA ARCHITECTURE
+==============================================================================
+
+The application should maintain two separate sources of data.
+
+--------------------------------------------------
+
+Source 1
+
+Original Demo Data
+
+students.json
+
+Read Only
+
+Never modify.
+
+--------------------------------------------------
+
+Source 2
+
+Local Storage
+
+Contains
+
+• Created Groups
+
+• Pending Join Requests
+
+• Group Confirmations
+
+• Group Notes
+
+• Conflict Records
+
+• Available Students
+
+• User Preferences (if any)
+
+--------------------------------------------------
+
+Application Layer
+
+Always merge
+
+Original JSON
+
++
+
+Local Storage
+
+into one unified application state.
+
+Never overwrite the original dataset.
+
+Never duplicate data unnecessarily.
+
+==============================================================================
+
+APPLICATION STARTUP
+==============================================================================
+
+Whenever the application starts
+
+perform the following sequence.
+
+Step 1
+
+Load students.json
+
+↓
+
+Step 2
+
+Load Local Storage
+
+↓
+
+Step 3
+
+Validate Local Storage
+
+↓
+
+Step 4
+
+Merge data
+
+↓
+
+Step 5
+
+Calculate groups
+
+↓
+
+Step 6
+
+Calculate statistics
+
+↓
+
+Step 7
+
+Render dashboard
+
+This should happen automatically.
+
+==============================================================================
+
+SEARCH IMPROVEMENTS
+==============================================================================
+
+Search should support
+
+Enrollment Number
+
+Student Name
+
+Partial Name
+
+Partial Enrollment
+
+Search should be
+
+Case insensitive
+
+Whitespace insensitive
+
+Fast
+
+Instant
+
+Animated
+
+Search should immediately update while typing.
+
+Maintain keyboard navigation.
+
+Arrow Keys
+
+Enter
+
+Escape
+
+Maintain autocomplete.
+
+Highlight matched text.
+
+==============================================================================
+
+GROUP SORTING
+==============================================================================
+
+Dashboard should automatically support sorting by
+
+Newest Group
+
+Oldest Group
+
+Most Members
+
+Least Members
+
+Most Confirmed
+
+Least Confirmed
+
+Most Requests
+
+Most Conflicts
+
+Alphabetical
+
+This should enhance usability without changing the overall UI.
+
+==============================================================================
+
+GROUP FILTERS
+==============================================================================
+
+Support filtering by
+
+Division A
+
+Division B
+
+CS
+
+AI/ML
+
+Healthy Groups
+
+Conflict Groups
+
+Groups With Available Seats
+
+Full Groups
+
+Groups With Pending Requests
+
+These filters should work instantly.
+
+==============================================================================
+
+EDGE CASES
+==============================================================================
+
+Handle all edge cases gracefully.
+
+Example
+
+Searching for a student that doesn't exist.
+
+Display a friendly empty state.
+
+--------------------------------------------------
+
+Attempting to create a group with only one member.
+
+Display validation.
+
+--------------------------------------------------
+
+Attempting to exceed four members.
+
+Prevent the action.
+
+--------------------------------------------------
+
+Attempting to add the same enrollment number twice inside one group.
+
+Prevent the action.
+
+--------------------------------------------------
+
+Attempting to mix CS and AI/ML students.
+
+Prevent the action.
+
+--------------------------------------------------
+
+Attempting to request to join a full group.
+
+Disable the Request To Join button.
+
+Explain why.
+
+--------------------------------------------------
+
+Local Storage corrupted.
+
+Automatically recover.
+
+Keep original demo data safe.
+
+==============================================================================
+
+RESET DEMO DATA
+==============================================================================
+
+Add a new feature.
+
+Reset Demo Data.
+
+Purpose
+
+Restore the application to its original state.
+
+When clicked
+
+Display confirmation dialog.
+
+"This will remove all locally created groups, requests, confirmations, notes, and conflicts.
+
+The original demo dataset will remain unchanged."
+
+Buttons
+
+Cancel
+
+Reset
+
+After reset
+
+Reload application state.
+
+==============================================================================
+
+PERSISTENCE
+==============================================================================
+
+Every user-generated action should immediately persist.
+
+Examples
+
+Create Group
+
+↓
+
+Saved
+
+--------------------------------------------------
+
+Request Join
+
+↓
+
+Saved
+
+--------------------------------------------------
+
+Confirm Membership
+
+↓
+
+Saved
+
+--------------------------------------------------
+
+Create Note
+
+↓
+
+Saved
+
+No data should disappear after refreshing the page.
+
+==============================================================================
+
+SERVICES
+==============================================================================
+
+Separate business logic from UI.
+
+Create reusable services for
+
+Student Service
+
+Group Service
+
+Conflict Service
+
+Statistics Service
+
+Search Service
+
+Storage Service
+
+No page should directly manipulate Local Storage.
+
+==============================================================================
+
+REUSABLE UTILITIES
+==============================================================================
+
+Create reusable utility functions.
+
+Examples
+
+validateEnrollment()
+
+generateGroupNumber()
+
+calculateSeats()
+
+calculateGroupHealth()
+
+calculateDashboardStatistics()
+
+mergeLocalData()
+
+detectConflicts()
+
+filterGroups()
+
+searchStudents()
+
+sortGroups()
+
+generateInitials()
+
+Keep components simple.
+
+==============================================================================
+
+UI POLISH
+==============================================================================
+
+Maintain the existing premium design.
+
+Do not replace the current design language.
+
+Enhance only where required.
+
+Maintain
+
+Animations
+
+Gradients
+
+Cards
+
+Spacing
+
+Typography
+
+Icons
+
+Responsive layout
+
+Micro interactions
+
+All new components should visually match the existing application.
+
+==============================================================================
+
+LOADING STATES
+==============================================================================
+
+Whenever data is loading
+
+Display
+
+Skeleton Cards
+
+Skeleton Statistics
+
+Skeleton Lists
+
+Do not display blank screens.
+
+==============================================================================
+
+EMPTY STATES
+==============================================================================
+
+Design beautiful empty states for
+
+No Groups
+
+No Requests
+
+No Search Results
+
+No Notes
+
+No Conflicts
+
+No Available Students
+
+Each should contain
+
+Illustration
+
+Friendly message
+
+Helpful action button
+
+==============================================================================
+
+ERROR HANDLING
+==============================================================================
+
+Never use browser alerts.
+
+Use
+
+Dialogs
+
+Toasts
+
+Inline validation
+
+Professional error cards
+
+Messages should clearly explain
+
+What happened
+
+Why it happened
+
+How to fix it
+
+==============================================================================
+
+PERFORMANCE
+==============================================================================
+
+Avoid unnecessary re-renders.
+
+Reuse components.
+
+Memoize expensive calculations when appropriate.
+
+Avoid duplicate loops through the dataset.
+
+Derive dashboard statistics from a single calculated state whenever possible.
+
+==============================================================================
+
+ACCESSIBILITY
+==============================================================================
+
+Maintain accessibility throughout the new features.
+
+Keyboard navigation
+
+ARIA labels
+
+Semantic HTML
+
+Visible focus states
+
+Proper button labels
+
+Screen reader friendly forms
+
+==============================================================================
+
+RESPONSIVENESS
+==============================================================================
+
+Verify every new feature on
+
+Desktop
+
+Laptop
+
+Tablet
+
+Mobile
+
+No horizontal scrolling.
+
+Cards should stack naturally.
+
+Modals should remain usable on small screens.
+
+==============================================================================
+
+CODE QUALITY
+==============================================================================
+
+Follow the existing coding style.
+
+Use meaningful variable names.
+
+Avoid duplicated logic.
+
+Prefer composition over large components.
+
+Keep components focused on a single responsibility.
+
+Use strict TypeScript types.
+
+Avoid unnecessary "any" types.
+
+==============================================================================
+
+FINAL ACCEPTANCE CRITERIA
+==============================================================================
+
+The implementation is complete ONLY when:
+
+✓ Existing functionality continues to work.
+
+✓ Existing UI remains visually consistent.
+
+✓ Search works by enrollment number and student name.
+
+✓ Only CS and AI/ML specializations exist.
+
+✓ Division A and B are displayed correctly.
+
+✓ Mixed-specialization groups are prevented.
+
+✓ Duplicate enrollment within a group is prevented.
+
+✓ Cross-group duplicates create conflicts.
+
+✓ Conflict Center displays all conflicts.
+
+✓ Groups can be created.
+
+✓ Requests to Join work correctly.
+
+✓ Group confirmations work correctly.
+
+✓ Group notes work correctly.
+
+✓ Dashboard statistics update automatically.
+
+✓ Local Storage persists all user-generated data.
+
+✓ Reset Demo Data restores the original application state.
+
+✓ Responsive design remains intact.
+
+✓ No TypeScript errors.
+
+✓ No linting errors.
+
+✓ No broken routes.
+
+✓ No broken components.
+
+✓ No placeholder implementations.
+
+==============================================================================
+
+DEFINITION OF DONE
+==============================================================================
+
+The project should feel like a mature product rather than a student assignment.
+
+A new user should believe these collaboration features were designed as part of SquadFinder from the very beginning.
+
+The application should remain clean, maintainable, responsive, scalable, and production-ready while preserving its premium visual identity.
+
+# END OF IMPLEMENTATION SPECIFICATION

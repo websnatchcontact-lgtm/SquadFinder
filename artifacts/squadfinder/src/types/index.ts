@@ -1,9 +1,16 @@
-// Core domain types for SquadFinder.
-// Avoid `any` everywhere -- every shape used across services/hooks/components lives here.
+// Core domain types for SquadFinder's Capstone Group Coordination Platform.
+// The app has two data sources that are always merged into one unified state:
+//  1. data/students.json -- the original, read-only demo roster.
+//  2. Local Storage -- everything students create at runtime (groups, requests,
+//     confirmations, notes, and "looking for a group" registrations).
 
-export type StudentStatus = 'GROUPED' | 'FREE' | 'MISMATCH';
+export type StudentStatus = 'GROUPED' | 'FREE';
 
-export type SpecializationCode = 'CS' | 'IT' | 'AI' | 'DS' | 'CY' | 'EC';
+/** Only two specializations exist anywhere in the app. */
+export type SpecializationCode = 'CS' | 'AIML';
+
+/** The two college divisions. Division has no grouping restriction. */
+export type DivisionCode = 'A' | 'B';
 
 export interface SpecializationInfo {
   code: SpecializationCode;
@@ -15,21 +22,71 @@ export interface Student {
   enrollment: string;
   name: string;
   specialization: SpecializationCode;
+  division: DivisionCode;
   group: string | null;
   status: StudentStatus;
   /** Present only for students added via "I'm Looking For A Group" (Local Storage). */
   addedAt?: string;
 }
 
-/** A dynamically computed group, derived from the student list at read time. */
+/** A pending request to join a group. Never auto-accepted -- informational only. */
+export interface JoinRequest {
+  id: string;
+  groupNumber: string;
+  name: string;
+  enrollment: string;
+  division: DivisionCode;
+  specialization: SpecializationCode;
+  note?: string;
+  requestedAt: string;
+  status: 'PENDING';
+}
+
+/** A single member of a group, with confirmation state. */
+export interface GroupMember {
+  enrollment: string;
+  name: string;
+  division: DivisionCode;
+  specialization: SpecializationCode;
+  confirmed: boolean;
+  isCreator: boolean;
+}
+
+export type GroupHealth = 'healthy' | 'pending' | 'conflict';
+
+/** A fully-derived group, merged from demo data and/or Local Storage overlays. */
 export interface Group {
   groupNumber: string;
-  members: Student[];
+  source: 'demo' | 'local';
+  specialization: SpecializationCode;
+  createdBy: string | null;
+  createdAt: string | null;
+  members: GroupMember[];
+  notes: string;
+  requests: JoinRequest[];
   totalMembers: number;
+  confirmedMembers: number;
   seatsLeft: number;
   isFull: boolean;
-  isMismatched: boolean;
-  specializationCounts: Partial<Record<SpecializationCode, number>>;
+  conflictCount: number;
+  health: GroupHealth;
+  divisionCounts: Partial<Record<DivisionCode, number>>;
+}
+
+/** A student whose enrollment number appears in more than one group. */
+export interface ConflictAppearance {
+  groupNumber: string;
+  createdBy: string | null;
+  createdAt: string | null;
+}
+
+export interface ConflictRecord {
+  enrollment: string;
+  name: string;
+  specialization: SpecializationCode;
+  division: DivisionCode;
+  severity: 'one' | 'multiple';
+  appearsIn: ConflictAppearance[];
 }
 
 export interface DashboardStats {
@@ -37,25 +94,70 @@ export interface DashboardStats {
   totalGroups: number;
   studentsInGroups: number;
   studentsLooking: number;
-  mismatchStudents: number;
-  groupsFull: number;
-  groupsWithOpenSeats: number;
-  availableSeatsRemaining: number;
+  confirmedMembers: number;
+  unconfirmedMembers: number;
+  pendingRequests: number;
+  openSeats: number;
+  conflictCount: number;
   csStudents: number;
   aimlStudents: number;
-  mixedGroups: number;
+  divisionAStudents: number;
+  divisionBStudents: number;
   averageGroupSize: number;
   largestGroupSize: number;
   smallestGroupSize: number;
-  specializationBreakdown: Partial<Record<SpecializationCode, number>>;
+  recentGroups: Group[];
 }
 
-export interface SearchResult {
-  student: Student;
-  group: Group | null;
+export type GroupSortKey =
+  | 'newest'
+  | 'oldest'
+  | 'mostMembers'
+  | 'leastMembers'
+  | 'mostConfirmed'
+  | 'leastConfirmed'
+  | 'mostRequests'
+  | 'mostConflicts'
+  | 'alphabetical';
+
+export interface GroupFilters {
+  division?: DivisionCode;
+  specialization?: SpecializationCode;
+  health?: GroupHealth;
+  hasOpenSeats?: boolean;
+  isFull?: boolean;
+  hasPendingRequests?: boolean;
 }
 
-/** A student who registered interest via "I'm Looking For A Group". */
-export interface AvailableStudent extends Student {
-  status: 'FREE';
+export interface CreateGroupMemberInput {
+  name: string;
+  enrollment: string;
+  division: DivisionCode;
+  specialization: SpecializationCode;
+}
+
+export interface CreateGroupInput {
+  creatorName: string;
+  members: CreateGroupMemberInput[];
+}
+
+export interface RequestToJoinInput {
+  name: string;
+  enrollment: string;
+  division: DivisionCode;
+  specialization: SpecializationCode;
+  note?: string;
+}
+
+export interface RegisterLookingForGroupInput {
+  enrollment: string;
+  name: string;
+  division: DivisionCode;
+  specialization: SpecializationCode;
+}
+
+/** Result of a validation check -- never throws, always explains itself. */
+export interface ValidationResult {
+  valid: boolean;
+  message?: string;
 }

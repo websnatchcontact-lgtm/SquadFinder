@@ -1,28 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { getAllGroups, getDashboardStatistics } from '@/services/student.service';
-import type { DashboardStats, Group } from '@/types';
+import { calculateDashboardStatistics } from '@/services/statistics.service';
+import type { DashboardStats } from '@/types';
 
-/** Dashboard aggregates, derived fresh from the current roster. */
-export function useStatistics(): { stats: DashboardStats | undefined; isLoading: boolean } {
+/** Dashboard aggregates, derived fresh from the current roster and groups. */
+export function useStatistics(): {
+  stats: DashboardStats | undefined;
+  isLoading: boolean;
+  refresh: () => void;
+} {
   const [stats, setStats] = useState<DashboardStats | undefined>(undefined);
 
-  useEffect(() => {
-    setStats(getDashboardStatistics());
+  const refresh = useCallback(() => {
+    setStats(calculateDashboardStatistics());
   }, []);
 
-  return { stats, isLoading: stats === undefined };
-}
-
-/** Every derived group in the roster, sorted by group number. */
-export function useGroups(): { groups: Group[]; isLoading: boolean } {
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
-    setGroups(getAllGroups());
-    setIsLoading(false);
-  }, []);
+    refresh();
+  }, [refresh]);
 
-  return { groups, isLoading };
+  return { stats, isLoading: stats === undefined, refresh };
 }

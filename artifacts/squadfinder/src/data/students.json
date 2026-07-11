@@ -1,499 +1,570 @@
 [
   {
-    "enrollment": "23CS001",
+    "enrollment": "230001",
     "name": "Aarav Shah",
     "specialization": "CS",
-    "group": "A01",
+    "division": "A",
+    "group": "Group 1",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT001",
+    "enrollment": "230002",
     "name": "Vivaan Shah",
-    "specialization": "IT",
-    "group": "A01",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 1",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23AI001",
+    "enrollment": "230003",
     "name": "Aditya Shah",
-    "specialization": "AI",
-    "group": "A01",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 2",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23DS001",
+    "enrollment": "230004",
     "name": "Vihaan Shah",
-    "specialization": "DS",
-    "group": "A01",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 2",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23CY001",
+    "enrollment": "230005",
     "name": "Arjun Shah",
-    "specialization": "CY",
-    "group": "A02",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 2",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23EC001",
+    "enrollment": "230006",
     "name": "Sai Shah",
-    "specialization": "EC",
-    "group": "A02",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 3",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23CS002",
+    "enrollment": "230007",
     "name": "Reyansh Shah",
     "specialization": "CS",
-    "group": "A02",
+    "division": "A",
+    "group": "Group 3",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT002",
+    "enrollment": "230008",
+    "name": "Ayaan Shah",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 3",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230009",
     "name": "Krishna Shah",
-    "specialization": "IT",
-    "group": "A02",
+    "specialization": "CS",
+    "division": "A",
+    "group": "Group 3",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23AI002",
+    "enrollment": "230010",
     "name": "Ishaan Shah",
-    "specialization": "AI",
-    "group": "A02",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 4",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23DS002",
-    "name": "Kabir Shah",
-    "specialization": "DS",
-    "group": "A03",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CY002",
+    "enrollment": "230011",
     "name": "Rohan Shah",
-    "specialization": "CY",
-    "group": "A03",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 4",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23EC002",
+    "enrollment": "230012",
+    "name": "Kabir Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 4",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230013",
     "name": "Aryan Shah",
-    "specialization": "EC",
-    "group": "A03",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CS003",
-    "name": "Devansh Shah",
     "specialization": "CS",
-    "group": "A04",
+    "division": "A",
+    "group": "Group 5",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT003",
+    "enrollment": "230014",
+    "name": "Dev Shah",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 5",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230015",
     "name": "Yash Shah",
-    "specialization": "IT",
-    "group": "A04",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23AI003",
-    "name": "Shaurya Shah",
-    "specialization": "AI",
-    "group": "A04",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23DS003",
-    "name": "Ansh Shah",
-    "specialization": "DS",
-    "group": "A04",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CY003",
-    "name": "Dhruv Shah",
-    "specialization": "CY",
-    "group": "A05",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23EC003",
-    "name": "Kartik Shah",
-    "specialization": "EC",
-    "group": "A05",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CS004",
-    "name": "Om Shah",
     "specialization": "CS",
-    "group": "A05",
+    "division": "A",
+    "group": "Group 5",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT004",
-    "name": "Rudra Shah",
-    "specialization": "IT",
-    "group": "A05",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23AI004",
-    "name": "Ananya Shah",
-    "specialization": "AI",
-    "group": "A05",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23DS004",
-    "name": "Diya Shah",
-    "specialization": "DS",
-    "group": "A06",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CY004",
-    "name": "Saanvi Shah",
-    "specialization": "CY",
-    "group": "A06",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23EC004",
-    "name": "Aadhya Shah",
-    "specialization": "EC",
-    "group": "A06",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CS005",
-    "name": "Kiara Shah",
-    "specialization": "CS",
-    "group": "A07",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23IT005",
-    "name": "Myra Shah",
-    "specialization": "IT",
-    "group": "A07",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23AI005",
-    "name": "Anika Shah",
-    "specialization": "AI",
-    "group": "A07",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23DS005",
-    "name": "Navya Shah",
-    "specialization": "DS",
-    "group": "A07",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CY005",
+    "enrollment": "230016",
     "name": "Riya Shah",
-    "specialization": "CY",
-    "group": "A08",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23EC005",
-    "name": "Ira Shah",
-    "specialization": "EC",
-    "group": "A08",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CS006",
-    "name": "Prisha Shah",
     "specialization": "CS",
-    "group": "A08",
+    "division": "B",
+    "group": "Group 5",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT006",
-    "name": "Aarohi Shah",
-    "specialization": "IT",
-    "group": "A08",
+    "enrollment": "230017",
+    "name": "Ananya Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 6",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23AI006",
-    "name": "Ishita Shah",
-    "specialization": "AI",
-    "group": "A09",
+    "enrollment": "230018",
+    "name": "Diya Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 6",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23DS006",
-    "name": "Siya Shah",
-    "specialization": "DS",
-    "group": "A09",
+    "enrollment": "230019",
+    "name": "Saanvi Shah",
+    "specialization": "CS",
+    "division": "A",
+    "group": "Group 7",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23CY006",
-    "name": "Avni Shah",
-    "specialization": "CY",
-    "group": "A09",
+    "enrollment": "230020",
+    "name": "Myra Shah",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 7",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23EC006",
-    "name": "Vanya Shah",
-    "specialization": "EC",
-    "group": "A09",
+    "enrollment": "230021",
+    "name": "Aadhya Shah",
+    "specialization": "CS",
+    "division": "A",
+    "group": "Group 7",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23CS007",
+    "enrollment": "230022",
+    "name": "Kiara Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 8",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230023",
+    "name": "Pari Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 8",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230024",
+    "name": "Anika Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 8",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230025",
+    "name": "Ira Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 8",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230026",
+    "name": "Meera Shah",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 9",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230027",
+    "name": "Sara Shah",
+    "specialization": "CS",
+    "division": "A",
+    "group": "Group 9",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230028",
     "name": "Tara Shah",
     "specialization": "CS",
-    "group": "A09",
+    "division": "B",
+    "group": "Group 9",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT007",
-    "name": "Meera Shah",
-    "specialization": "IT",
-    "group": "A10",
+    "enrollment": "230029",
+    "name": "Naman Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 10",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23AI007",
-    "name": "Jiya Shah",
-    "specialization": "AI",
-    "group": "A10",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23DS007",
-    "name": "Anvi Shah",
-    "specialization": "DS",
-    "group": "A10",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CY007",
-    "name": "Parth Shah",
-    "specialization": "CY",
-    "group": "A11",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23EC007",
+    "enrollment": "230030",
     "name": "Nikhil Shah",
-    "specialization": "EC",
-    "group": "A11",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 10",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23CS008",
-    "name": "Harsh Shah",
+    "enrollment": "230031",
+    "name": "Parth Shah",
     "specialization": "CS",
-    "group": "A11",
+    "division": "A",
+    "group": "Group 11",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT008",
-    "name": "Manav Shah",
-    "specialization": "IT",
-    "group": "A11",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23AI008",
-    "name": "Yuvraj Shah",
-    "specialization": "AI",
-    "group": "A12",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23DS008",
-    "name": "Raghav Shah",
-    "specialization": "DS",
-    "group": "A12",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CY008",
-    "name": "Vedant Shah",
-    "specialization": "CY",
-    "group": "A12",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23EC008",
-    "name": "Aniket Shah",
-    "specialization": "EC",
-    "group": "A12",
-    "status": "GROUPED"
-  },
-  {
-    "enrollment": "23CS009",
-    "name": "Karan Shah",
+    "enrollment": "230032",
+    "name": "Raj Shah",
     "specialization": "CS",
-    "group": "A12",
+    "division": "B",
+    "group": "Group 11",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT009",
-    "name": "Tanmay Shah",
-    "specialization": "IT",
-    "group": "A13",
+    "enrollment": "230033",
+    "name": "Sameer Shah",
+    "specialization": "CS",
+    "division": "A",
+    "group": "Group 11",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23AI009",
-    "name": "Sneha Shah",
-    "specialization": "AI",
-    "group": "A13",
+    "enrollment": "230034",
+    "name": "Tanish Shah",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 11",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23DS009",
-    "name": "Pooja Shah",
-    "specialization": "DS",
-    "group": "A13",
+    "enrollment": "230035",
+    "name": "Uday Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 12",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23CY009",
-    "name": "Neha Shah",
-    "specialization": "CY",
-    "group": "A13",
+    "enrollment": "230036",
+    "name": "Vansh Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 12",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23EC009",
-    "name": "Kavya Shah",
-    "specialization": "EC",
-    "group": "A14",
+    "enrollment": "230037",
+    "name": "Zoya Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 12",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23CS010",
+    "enrollment": "230038",
     "name": "Priya Shah",
     "specialization": "CS",
-    "group": "A14",
+    "division": "B",
+    "group": "Group 13",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23IT010",
-    "name": "Nisha Shah",
-    "specialization": "IT",
-    "group": "A14",
+    "enrollment": "230039",
+    "name": "Neha Shah",
+    "specialization": "CS",
+    "division": "A",
+    "group": "Group 13",
     "status": "GROUPED"
   },
   {
-    "enrollment": "23AI010",
-    "name": "Radhika Shah",
-    "specialization": "AI",
-    "group": null,
-    "status": "FREE"
+    "enrollment": "230040",
+    "name": "Kavya Shah",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 13",
+    "status": "GROUPED"
   },
   {
-    "enrollment": "23DS010",
+    "enrollment": "230041",
+    "name": "Ishita Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 14",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230042",
     "name": "Simran Shah",
-    "specialization": "DS",
-    "group": null,
-    "status": "FREE"
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 14",
+    "status": "GROUPED"
   },
   {
-    "enrollment": "23CY010",
-    "name": "Trisha Shah",
-    "specialization": "CY",
-    "group": null,
-    "status": "FREE"
+    "enrollment": "230043",
+    "name": "Aisha Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 14",
+    "status": "GROUPED"
   },
   {
-    "enrollment": "23EC010",
-    "name": "Zara Shah",
-    "specialization": "EC",
-    "group": null,
-    "status": "FREE"
+    "enrollment": "230044",
+    "name": "Fatima Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 14",
+    "status": "GROUPED"
   },
   {
-    "enrollment": "23CS011",
-    "name": "Aksh Shah",
+    "enrollment": "230045",
+    "name": "Om Shah",
     "specialization": "CS",
-    "group": null,
-    "status": "FREE"
+    "division": "A",
+    "group": "Group 15",
+    "status": "GROUPED"
   },
   {
-    "enrollment": "23IT011",
-    "name": "Dev Shah",
-    "specialization": "IT",
-    "group": null,
-    "status": "FREE"
-  },
-  {
-    "enrollment": "23AI011",
-    "name": "Veer Shah",
-    "specialization": "AI",
-    "group": null,
-    "status": "FREE"
-  },
-  {
-    "enrollment": "23DS011",
-    "name": "Samar Shah",
-    "specialization": "DS",
-    "group": null,
-    "status": "FREE"
-  },
-  {
-    "enrollment": "23CY011",
-    "name": "Ronit Shah",
-    "specialization": "CY",
-    "group": null,
-    "status": "FREE"
-  },
-  {
-    "enrollment": "23EC011",
-    "name": "Advait Shah",
-    "specialization": "EC",
-    "group": null,
-    "status": "FREE"
-  },
-  {
-    "enrollment": "23CS012",
-    "name": "Laksh Shah",
+    "enrollment": "230046",
+    "name": "Sarthak Shah",
     "specialization": "CS",
+    "division": "B",
+    "group": "Group 15",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230047",
+    "name": "Harsh Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 16",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230048",
+    "name": "Rudra Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 16",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230049",
+    "name": "Shivansh Shah",
+    "specialization": "AIML",
+    "division": "A",
+    "group": "Group 16",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230003",
+    "name": "Aditya Shah",
+    "specialization": "AIML",
+    "division": "B",
+    "group": "Group 4",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230006",
+    "name": "Sai Shah",
+    "specialization": "CS",
+    "division": "B",
+    "group": "Group 1",
+    "status": "GROUPED"
+  },
+  {
+    "enrollment": "230050",
+    "name": "Manav Shah",
+    "specialization": "CS",
+    "division": "B",
     "group": null,
     "status": "FREE"
   },
   {
-    "enrollment": "23IT012",
-    "name": "Naman Shah",
-    "specialization": "IT",
-    "group": null,
-    "status": "FREE"
-  },
-  {
-    "enrollment": "23AI012",
-    "name": "Pranav Shah",
-    "specialization": "AI",
-    "group": "Z99",
-    "status": "MISMATCH"
-  },
-  {
-    "enrollment": "23DS012",
-    "name": "Tejas Shah",
-    "specialization": "DS",
-    "group": "Z98",
-    "status": "MISMATCH"
-  },
-  {
-    "enrollment": "23CY012",
+    "enrollment": "230051",
     "name": "Aarav Patel",
-    "specialization": "CY",
-    "group": "X01",
-    "status": "MISMATCH"
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230052",
+    "name": "Vivaan Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230053",
+    "name": "Aditya Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230054",
+    "name": "Vihaan Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230055",
+    "name": "Arjun Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230056",
+    "name": "Sai Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230057",
+    "name": "Reyansh Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230058",
+    "name": "Ayaan Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230059",
+    "name": "Krishna Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230060",
+    "name": "Ishaan Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230061",
+    "name": "Rohan Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230062",
+    "name": "Kabir Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230063",
+    "name": "Aryan Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230064",
+    "name": "Dev Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230065",
+    "name": "Yash Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230066",
+    "name": "Riya Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230067",
+    "name": "Ananya Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230068",
+    "name": "Diya Patel",
+    "specialization": "CS",
+    "division": "B",
+    "group": null,
+    "status": "FREE"
+  },
+  {
+    "enrollment": "230069",
+    "name": "Saanvi Patel",
+    "specialization": "AIML",
+    "division": "A",
+    "group": null,
+    "status": "FREE"
   }
 ]

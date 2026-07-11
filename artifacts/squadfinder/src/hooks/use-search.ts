@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { searchStudentsByQuery } from '@/services/student.service';
+import { useStudents } from '@/hooks/use-students';
+import { searchStudents } from '@/services/search.service';
 import type { Student } from '@/types';
 
 /**
- * Live search-as-you-type across enrollment number and name. Debounced with a
- * short delay so the UI can show a loading/skeleton state while "searching".
+ * Live search-as-you-type across enrollment number and name, supporting
+ * partial matches on either field. Debounced with a short delay so the UI
+ * can show a "searching" state while results settle.
  */
 export function useSearch(query: string, debounceMs = 150): { results: Student[]; isSearching: boolean } {
+  const { students } = useStudents();
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -22,7 +25,10 @@ export function useSearch(query: string, debounceMs = 150): { results: Student[]
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, debounceMs]);
 
-  const results = useMemo(() => searchStudentsByQuery(debouncedQuery), [debouncedQuery]);
+  const results: Student[] = useMemo(
+    () => searchStudents(students, debouncedQuery),
+    [students, debouncedQuery],
+  );
 
   return { results, isSearching };
 }

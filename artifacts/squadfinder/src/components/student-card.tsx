@@ -3,14 +3,11 @@ import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { generateInitials, formatStatus } from "@/utils/students";
 import { cn } from "@/lib/utils";
-import { Users, AlertCircle } from "lucide-react";
+import { Users } from "lucide-react";
 
 export function StatusBadge({ status }: { status: StudentStatus }) {
   if (status === "GROUPED") {
     return <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 font-medium">{formatStatus(status)}</Badge>;
-  }
-  if (status === "MISMATCH") {
-    return <Badge variant="destructive" className="font-medium"><AlertCircle className="w-3 h-3 mr-1" />{formatStatus(status)}</Badge>;
   }
   return <Badge variant="default" className="font-medium"><Users className="w-3 h-3 mr-1" />{formatStatus(status)}</Badge>;
 }
@@ -30,13 +27,16 @@ export function StudentCard({ student, className }: { student: Student; classNam
             <span className="text-sm text-muted-foreground truncate">{student.enrollment}</span>
           </div>
         </div>
-        <Badge variant="outline" className="font-mono text-xs">{student.specialization}</Badge>
+        <div className="flex flex-col gap-1 items-end">
+          <Badge variant="outline" className="font-mono text-xs">{student.specialization}</Badge>
+          <Badge variant="outline" className="font-mono text-xs bg-muted/30">Div {student.division}</Badge>
+        </div>
       </div>
       
       <div className="mt-4 flex items-center justify-between">
         <StatusBadge status={student.status} />
         {student.group && (
-          <Badge variant="secondary" className="text-xs">Group {student.group}</Badge>
+          <Badge variant="secondary" className="text-xs">{student.group}</Badge>
         )}
       </div>
     </div>

@@ -5,12 +5,14 @@ import { useSearch } from "@/hooks/use-search";
 import { SearchInput } from "@/components/ui/search-input";
 import { StudentCard } from "@/components/student-card";
 import { GroupCard } from "@/components/group-card";
-import { useGroup } from "@/hooks/use-students";
+import { useStudents } from "@/hooks/use-students";
+import { useGroup as useGroupFull } from "@/hooks/use-groups";
+import { useGroupActions } from "@/hooks/use-group-actions";
 import { EmptyState } from "@/components/empty-state";
 import { Search, Loader2, UserPlus, Compass, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ROUTES, SPECIALIZATION_LIST } from "@/constants";
+import { ROUTES, SPECIALIZATION_LIST, DIVISION_LIST } from "@/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,12 +21,13 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { searchStudentsByQuery } from "@/services/student.service"; // Direct for custom search hook
+import { ConfirmationBadge } from "@/components/badges";
 
 const formSchema = z.object({
   enrollment: z.string().min(8, "Enrollment number is too short").max(20, "Enrollment number is too long"),
   name: z.string().min(2, "Name must be at least 2 characters"),
-  specialization: z.enum(["CS", "IT", "AI", "DS", "CY", "EC"]),
+  specialization: z.enum(["CS", "AIML"]),
+  division: z.enum(["A", "B"]),
 });
 
 export default function SearchPage() {
@@ -36,9 +39,11 @@ export default function SearchPage() {
   const showResults = query.trim().length > 0;
   
   const studentMatch = results.find(s => s.enrollment === selectedStudent) || (results.length === 1 ? results[0] : null);
-  const studentGroup = useGroup(studentMatch?.group);
+  const { group: fullGroup, refresh: refreshGroup } = useGroupFull(studentMatch?.group);
+  const { confirm } = useGroupActions();
 
   const { register } = useRegisterLookingForGroup();
+  const { refresh: refreshStudents } = useStudents();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,18 +52,20 @@ export default function SearchPage() {
       enrollment: "",
       name: "",
       specialization: "CS",
+      division: "A",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       register(values);
+      refreshStudents();
       toast({
         title: "Successfully registered!",
         description: "You are now listed as looking for a group.",
       });
       setIsRegisterOpen(false);
-      setQuery(values.enrollment); // auto search for them
+      setQuery(values.enrollment);
       form.reset();
     } catch (e) {
       toast({
@@ -69,13 +76,27 @@ export default function SearchPage() {
     }
   }
 
+  const handleConfirmMembership = () => {
+    if (studentMatch && fullGroup) {
+      confirm(fullGroup.groupNumber, studentMatch.enrollment);
+      refreshGroup();
+      refreshStudents();
+      toast({
+        title: "Membership Confirmed",
+        description: `You are now confirmed in ${fullGroup.groupNumber}`,
+      });
+    }
+  };
+
+  const isConfirmed = fullGroup?.members.find(m => m.enrollment === studentMatch?.enrollment)?.confirmed;
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-12 md:py-20 flex flex-col items-center max-w-4xl">
         <div className="text-center mb-10 w-full">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Find Your Status</h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">Find Any Student</h1>
           <p className="text-xl text-muted-foreground text-balance">
-            Enter your enrollment number to see your capstone group assignment and teammates.
+            Search by name or enrollment number to see group assignments, status, and confirmations.
           </p>
         </div>
 
@@ -83,7 +104,7 @@ export default function SearchPage() {
           <div className="relative group">
             <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:bg-primary/30 transition-colors opacity-50"></div>
             <SearchInput 
-              placeholder="Enter your Enrollment Number (e.g. 21012345)" 
+              placeholder="Search by Name or Enrollment Number..." 
               className="h-16 text-lg pl-14 rounded-2xl shadow-lg border-primary/20 bg-background relative z-10"
               icon={isSearching ? <Loader2 className="h-6 w-6 animate-spin text-primary" /> : <Search className="h-6 w-6 text-primary" />}
               value={query}
@@ -95,7 +116,6 @@ export default function SearchPage() {
             />
           </div>
 
-          {/* Quick results dropdown if multiple matches and none selected explicitly */}
           {showResults && results.length > 1 && !studentMatch && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-card border rounded-xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
               <div className="max-h-80 overflow-y-auto p-2 flex flex-col gap-1">
@@ -108,15 +128,20 @@ export default function SearchPage() {
                     className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted flex items-center justify-between transition-colors"
                     onClick={() => {
                       setSelectedStudent(student.enrollment);
-                      setQuery(student.enrollment); // Update input to exact match
+                      setQuery(student.enrollment);
                     }}
                   >
                     <div>
                       <div className="font-semibold">{student.name}</div>
                       <div className="text-sm text-muted-foreground">{student.enrollment}</div>
                     </div>
-                    <div className="text-xs font-mono bg-muted-foreground/10 px-2 py-1 rounded">
-                      {student.specialization}
+                    <div className="flex gap-2">
+                      <div className="text-xs font-mono bg-muted-foreground/10 px-2 py-1 rounded">
+                        Div {student.division}
+                      </div>
+                      <div className="text-xs font-mono bg-muted-foreground/10 px-2 py-1 rounded">
+                        {student.specialization}
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -125,14 +150,13 @@ export default function SearchPage() {
           )}
         </div>
 
-        {/* Selected Student View */}
         <div className="w-full">
           {!showResults ? (
             <div className="opacity-60 grayscale-[50%] pointer-events-none transition-opacity duration-500">
               <EmptyState 
                 icon={<Search className="w-8 h-8" />}
                 title="Awaiting Input"
-                description="Type an enrollment number above to instantly search the roster."
+                description="Type a name or enrollment number above to search the roster."
                 className="bg-transparent border-none"
               />
             </div>
@@ -140,7 +164,7 @@ export default function SearchPage() {
             <EmptyState 
               icon={<UserPlus className="w-8 h-8 text-primary" />}
               title="Student Not Found"
-              description={`We couldn't find anyone matching "${query}". Double check your enrollment number.`}
+              description={`We couldn't find anyone matching "${query}". Double check your search term.`}
               action={
                 <Button onClick={() => setIsRegisterOpen(true)} className="mt-2 rounded-full px-6">
                   Register as "Looking for a Team"
@@ -150,29 +174,49 @@ export default function SearchPage() {
           ) : studentMatch ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col gap-8 w-full">
               <div>
-                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Your Profile</h3>
+                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Profile</h3>
                 <StudentCard student={studentMatch} className="border-primary/20 shadow-md bg-primary/5" />
               </div>
 
-              {studentMatch.group && studentGroup ? (
+              {studentMatch.group && fullGroup ? (
                 <div>
-                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Your Group Info</h3>
+                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Group Info</h3>
                   <div className="grid md:grid-cols-2 gap-6">
-                    <GroupCard group={studentGroup} />
+                    <div className="flex flex-col gap-4">
+                      <GroupCard group={fullGroup} />
+                      {!isConfirmed && (
+                         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 flex flex-col items-center text-center gap-3">
+                           <h4 className="font-semibold text-amber-900 dark:text-amber-200">Confirmation Needed</h4>
+                           <p className="text-sm text-amber-800/80 dark:text-amber-200/80">
+                             You have been added to this group but haven't confirmed your membership yet.
+                           </p>
+                           <Button onClick={handleConfirmMembership} className="w-full mt-2">
+                             I Confirm I'm In This Group
+                           </Button>
+                         </div>
+                      )}
+                      {fullGroup.notes && (
+                        <div className="bg-muted/30 border rounded-xl p-4">
+                          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Group Notes</h4>
+                          <p className="text-sm whitespace-pre-wrap">{fullGroup.notes}</p>
+                        </div>
+                      )}
+                    </div>
                     <div className="flex flex-col gap-3">
                       <h4 className="font-semibold text-sm">All Teammates</h4>
-                      <div className="flex flex-col gap-2 overflow-y-auto max-h-[300px] pr-2">
-                        {studentGroup.members.filter(m => m.enrollment !== studentMatch.enrollment).map(member => (
-                          <div key={member.enrollment} className="flex items-center justify-between p-3 rounded-lg border bg-card text-sm">
-                            <div className="font-medium">{member.name}</div>
-                            <div className="text-muted-foreground font-mono text-xs">{member.specialization}</div>
+                      <div className="flex flex-col gap-2 overflow-y-auto max-h-[400px] pr-2">
+                        {fullGroup.members.map(member => (
+                          <div key={member.enrollment} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border bg-card shadow-sm gap-2">
+                            <div className="flex flex-col">
+                              <span className="font-medium text-sm">
+                                {member.name}
+                                {member.enrollment === studentMatch.enrollment && " (You)"}
+                              </span>
+                              <span className="text-xs text-muted-foreground font-mono">{member.specialization} • Div {member.division}</span>
+                            </div>
+                            <ConfirmationBadge confirmed={member.confirmed} />
                           </div>
                         ))}
-                        {studentGroup.members.length === 1 && (
-                          <div className="p-4 text-center border border-dashed rounded-lg text-muted-foreground text-sm">
-                            You are currently the only member in this group.
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -184,23 +228,13 @@ export default function SearchPage() {
                   </div>
                   <h3 className="text-2xl font-bold mb-2">No Group Assigned</h3>
                   <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                    You are currently marked as FREE. You don't have a capstone team yet.
+                    This student is currently marked as FREE and doesn't have a capstone team yet.
                   </p>
                   
                   <div className="flex gap-4">
                     <Button asChild variant="outline">
                       <Link href={ROUTES.available}>Browse Available Students</Link>
                     </Button>
-                    {studentMatch.status !== 'FREE' && (
-                       <Button onClick={() => {
-                        form.setValue("enrollment", studentMatch.enrollment);
-                        form.setValue("name", studentMatch.name);
-                        form.setValue("specialization", studentMatch.specialization);
-                        setIsRegisterOpen(true);
-                       }}>
-                         List Myself as Available
-                       </Button>
-                    )}
                   </div>
                 </div>
               )}
@@ -209,7 +243,6 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* Registration Dialog */}
       <Dialog open={isRegisterOpen} onOpenChange={setIsRegisterOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -247,30 +280,48 @@ export default function SearchPage() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="specialization"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Specialization</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a branch" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {SPECIALIZATION_LIST.map((spec) => (
-                          <SelectItem key={spec.code} value={spec.code}>
-                            {spec.label} ({spec.code})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="division"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Division</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="Select division" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {DIVISION_LIST.map((div) => (
+                            <SelectItem key={div} value={div}>Div {div}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="specialization"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Specialization</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="Select spec" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {SPECIALIZATION_LIST.map((spec) => (
+                            <SelectItem key={spec.code} value={spec.code}>{spec.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <div className="pt-4 flex justify-end">
                 <Button type="submit" className="w-full">Register Availability</Button>
               </div>
