@@ -15,7 +15,7 @@ interface StatCardProps {
 
 export function StatCard({ title, value, icon, description, trend, trendUp, className }: StatCardProps) {
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1", className)}>
       <CardContent className="p-6 flex flex-col justify-between h-full">
         <div className="flex items-center justify-between mb-4 text-muted-foreground">
           <h4 className="text-sm font-medium">{title}</h4>

@@ -8,7 +8,7 @@ import type {
   ValidationResult,
 } from '@/types';
 import { MAX_GROUP_MEMBERS, MIN_GROUP_MEMBERS, SPECIALIZATIONS } from '@/constants';
-import { loadBaselineStudents } from '@/services/student.service';
+
 import {
   getConfirmations,
   getCreatedGroups,
@@ -18,47 +18,14 @@ import {
   setCreatedGroups,
   setNotes,
   setRequests,
+  getLookingForGroup,
   type StoredCreatedGroup,
 } from '@/services/storage.service';
 import { calculateGroupHealth, calculateGroupSeats, generateGroupNumber } from '@/utils/groups';
 import { countGroupConflicts, detectConflicts } from '@/utils/conflicts';
 import { normalizeEnrollment, validateEnrollment, validateName } from '@/utils/validation';
 
-const DEMO_CREATED_BY = 'GLS Capstone Registry';
-const DEMO_CREATED_AT = '2026-01-15T09:00:00.000Z';
 
-/** Demo groups considered fully confirmed but left with one pending member, for variety. */
-const DEMO_PENDING_GROUPS = new Set(['Group 3', 'Group 9']);
-
-function buildDemoGroups(students: Student[]): StoredCreatedGroup[] {
-  const byGroup = new Map<string, Student[]>();
-  for (const student of students) {
-    if (!student.group) continue;
-    if (!byGroup.has(student.group)) byGroup.set(student.group, []);
-    byGroup.get(student.group)!.push(student);
-  }
-
-  const groups: StoredCreatedGroup[] = [];
-  for (const [groupNumber, members] of byGroup) {
-    const pendingLast = DEMO_PENDING_GROUPS.has(groupNumber);
-    groups.push({
-      groupNumber,
-      specialization: members[0]!.specialization,
-      createdBy: DEMO_CREATED_BY,
-      createdAt: DEMO_CREATED_AT,
-      members: members.map((m, index) => ({
-        enrollment: m.enrollment,
-        name: m.name,
-        division: m.division,
-        specialization: m.specialization,
-        isCreator: index === 0,
-        confirmed: pendingLast && index === members.length - 1 ? false : true,
-      })),
-    });
-  }
-
-  return groups.sort((a, b) => a.groupNumber.localeCompare(b.groupNumber, undefined, { numeric: true }));
-}
 
 function toDerivedGroup(
   stored: StoredCreatedGroup,
@@ -101,20 +68,14 @@ function toDerivedGroup(
   };
 }
 
-/** Every group in the app: demo groups plus locally-created groups, fully merged. */
 export function getAllGroups(): Group[] {
-  const students = loadBaselineStudents();
-  const demoStored = buildDemoGroups(students);
   const localStored = getCreatedGroups();
 
   const confirmations = getConfirmations();
   const requestsMap = getRequests();
   const notesMap = getNotes();
 
-  const groups = [
-    ...demoStored.map((g) => toDerivedGroup(g, 'demo', confirmations, requestsMap, notesMap)),
-    ...localStored.map((g) => toDerivedGroup(g, 'local', confirmations, requestsMap, notesMap)),
-  ];
+  const groups = localStored.map((g) => toDerivedGroup(g, 'local', confirmations, requestsMap, notesMap));
 
   const conflicts = detectConflicts(groups);
   for (const group of groups) {
@@ -151,6 +112,8 @@ export function validateCreateGroupInput(input: CreateGroupInput): ValidationRes
   }
 
   const seenEnrollments = new Set<string>();
+  const availableStudents = getLookingForGroup();
+  
   for (const member of input.members) {
     const memberNameCheck = validateName(member.name);
     if (!memberNameCheck.valid) return memberNameCheck;
@@ -162,6 +125,14 @@ export function validateCreateGroupInput(input: CreateGroupInput): ValidationRes
     if (seenEnrollments.has(normalized)) {
       return { valid: false, message: 'This student has already been added to this group.' };
     }
+    
+    if (availableStudents.some(s => s.enrollment === normalized)) {
+      return { 
+        valid: false, 
+        message: `This student is currently registered as Looking for a Team. Please remove them from the Available Students list before adding them to a group.`
+      };
+    }
+    
     seenEnrollments.add(normalized);
   }
 
@@ -191,8 +162,7 @@ export function findCrossGroupDuplicates(members: { enrollment: string }[]): str
 /** Creates a new group and persists it to Local Storage. Never touches students.json. */
 export function createGroup(input: CreateGroupInput): Group {
   const existing = getCreatedGroups();
-  const demoGroupNumbers = buildDemoGroups(loadBaselineStudents()).map((g) => g.groupNumber);
-  const groupNumber = generateGroupNumber([...demoGroupNumbers, ...existing.map((g) => g.groupNumber)]);
+  const groupNumber = generateGroupNumber([...existing.map((g) => g.groupNumber)]);
   const createdAt = new Date().toISOString();
   const specialization = input.members[0]!.specialization;
 
@@ -259,6 +229,7 @@ export function requestToJoin(groupNumber: string, input: RequestToJoinInput): J
     note: input.note?.trim() || undefined,
     requestedAt: new Date().toISOString(),
     status: 'PENDING',
+    pin: input.pin,
   };
 
   requestsMap[groupNumber] = [...(requestsMap[groupNumber] ?? []), request];

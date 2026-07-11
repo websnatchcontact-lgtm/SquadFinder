@@ -12,9 +12,9 @@ export function StatusBadge({ status }: { status: StudentStatus }) {
   return <Badge variant="default" className="font-medium"><Users className="w-3 h-3 mr-1" />{formatStatus(status)}</Badge>;
 }
 
-export function StudentCard({ student, className }: { student: Student; className?: string }) {
+export function StudentCard({ student, className, onRemoveClick }: { student: Student; className?: string; onRemoveClick?: () => void }) {
   return (
-    <div className={cn("flex flex-col p-4 rounded-xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow", className)} data-testid={`card-student-${student.enrollment}`}>
+    <div className={cn("flex flex-col p-4 rounded-xl border border-border/60 bg-card text-card-foreground shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative", className)} data-testid={`card-student-${student.enrollment}`}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 border bg-muted/50">
@@ -35,9 +35,19 @@ export function StudentCard({ student, className }: { student: Student; classNam
       
       <div className="mt-4 flex items-center justify-between">
         <StatusBadge status={student.status} />
-        {student.group && (
-          <Badge variant="secondary" className="text-xs">{student.group}</Badge>
-        )}
+        <div className="flex items-center gap-2">
+          {student.group && (
+            <Badge variant="secondary" className="text-xs">{student.group}</Badge>
+          )}
+          {onRemoveClick && (
+            <button 
+              onClick={onRemoveClick}
+              className="text-xs font-medium text-destructive hover:underline ml-2 py-1 px-2 hover:bg-destructive/10 rounded transition-colors"
+            >
+              Remove Me
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

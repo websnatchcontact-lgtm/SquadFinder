@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { loadBaselineStudents, registerLookingForGroup } from '@/services/student.service';
+import { getMergedStudents, registerLookingForGroup, removeLookingForGroup } from '@/services/student.service';
 import type { RegisterLookingForGroupInput, Student } from '@/types';
 
-/** Full merged roster (demo JSON + Local Storage "looking for a group" additions). */
+/** Full merged roster (demo JSON + Local Storage "looking for a group" additions + members of created groups). */
 export function useStudents(): { students: Student[]; isLoading: boolean; refresh: () => void } {
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refresh = useCallback(() => {
-    setStudents(loadBaselineStudents());
+    setStudents(getMergedStudents());
     setIsLoading(false);
   }, []);
 
@@ -30,9 +30,15 @@ export function useAvailableStudents(): {
   return { students: students.filter((s) => s.status === 'FREE'), isLoading, refresh };
 }
 
-/** Registers a student as looking for a group, returning the created record. */
 export function useRegisterLookingForGroup(): {
   register: (input: RegisterLookingForGroupInput) => Student;
 } {
   return { register: registerLookingForGroup };
+}
+
+/** Removes a student from looking for a group using a safety PIN. Returns true on success. */
+export function useRemoveLookingForGroup(): {
+  remove: (enrollment: string, pin: string) => boolean;
+} {
+  return { remove: removeLookingForGroup };
 }

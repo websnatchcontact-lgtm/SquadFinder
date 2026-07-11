@@ -1,5 +1,5 @@
 import type { DashboardStats } from '@/types';
-import { loadBaselineStudents } from '@/services/student.service';
+import { getMergedStudents } from '@/services/student.service';
 import { getAllGroups } from '@/services/group.service';
 import { getConflicts } from '@/services/conflict.service';
 
@@ -8,7 +8,7 @@ import { getConflicts } from '@/services/conflict.service';
  * roster and group list -- never duplicated loops through the dataset.
  */
 export function calculateDashboardStatistics(): DashboardStats {
-  const students = loadBaselineStudents();
+  const students = getMergedStudents();
   const groups = getAllGroups();
   const conflicts = getConflicts();
 

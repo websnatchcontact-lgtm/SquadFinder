@@ -12,7 +12,7 @@ export function GroupCard({ group, onClick, className }: { group: Group; onClick
   
   return (
     <Card 
-      className={cn("flex flex-col h-full overflow-hidden transition-all duration-200 group-hover:shadow-md", onClick && "cursor-pointer hover:border-primary/50", className)}
+      className={cn("flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1", onClick && "cursor-pointer hover:border-primary/50", className)}
       onClick={onClick}
       data-testid={`card-group-${groupNumber}`}
     >
@@ -57,7 +57,7 @@ export function GroupCard({ group, onClick, className }: { group: Group; onClick
                 <AvatarFallback className={cn("text-xs font-semibold", 
                   !member.confirmed ? "opacity-50 grayscale" : "",
                   i % 3 === 0 ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" :
-                  i % 3 === 1 ? "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" :
+                  i % 3 === 1 ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300" :
                   "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
                 )}>
                   {generateInitials(member.name)}

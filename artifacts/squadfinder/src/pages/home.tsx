@@ -12,7 +12,7 @@ export default function Home() {
       <section className="relative overflow-hidden pt-24 pb-32 lg:pt-36 lg:pb-40">
         <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02] bg-[size:32px]" />
         <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-primary/20 blur-3xl opacity-50 pointer-events-none" />
-        <div className="absolute top-40 -left-40 w-96 h-96 rounded-full bg-purple-500/20 blur-3xl opacity-50 pointer-events-none" />
+        <div className="absolute top-40 -left-40 w-96 h-96 rounded-full bg-primary/10 blur-3xl opacity-50 pointer-events-none" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
@@ -85,7 +85,7 @@ export default function Home() {
               delay={0.1}
             />
             <FeatureCard 
-              icon={<Compass className="w-6 h-6 text-purple-500" />}
+              icon={<Compass className="w-6 h-6 text-indigo-500" />}
               title="Discover Talent"
               description="Browse students who are looking for a team. Filter by specialization to fill your skill gaps."
               delay={0.2}
@@ -104,25 +104,25 @@ export default function Home() {
       <section className="py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold tracking-tight mb-16 text-center">How to use SquadFinder</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-16 text-center">How SquadFinder Works</h2>
             
             <div className="space-y-12">
               <Step 
                 number="01"
-                title="Search your enrollment"
-                description="Use the search bar to check your current status. The data is pre-loaded from the university roster."
+                title="Search or Create Your Group"
+                description="Search using your enrollment number or student name to check whether you're already part of a registered group. If your group hasn't been registered yet, create a new group by entering your teammates' details."
                 icon={<Lock className="w-5 h-5" />}
               />
               <Step 
                 number="02"
-                title="If you have a group..."
-                description="You'll see your Group ID and all your assigned teammates in one clean view. Verify everything is correct."
+                title="Verify & Confirm Your Membership"
+                description="Review your group's members, available seats, requests, and notes. If you're listed in the correct group, confirm your membership. If there's conflicting information, the application will clearly highlight it for everyone."
                 icon={<Users className="w-5 h-5" />}
               />
               <Step 
                 number="03"
-                title="If you need a group..."
-                description="Register yourself as 'Looking for a Team'. Your profile will appear in the Available section for other groups to find you."
+                title="Find Teammates & Send Requests"
+                description="If you're still looking for a team, browse groups with available seats and send a join request. Group members can view pending requests, helping everyone coordinate before submitting the final Capstone team."
                 icon={<Filter className="w-5 h-5" />}
               />
             </div>
@@ -154,7 +154,7 @@ function FeatureCard({ icon, title, description, delay }: { icon: React.ReactNod
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.5, delay }}
-      className="bg-card border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
+      className="bg-card border border-border/60 rounded-2xl p-8 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
     >
       <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mb-6">
         {icon}

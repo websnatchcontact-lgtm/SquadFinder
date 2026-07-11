@@ -1,15 +1,16 @@
 import { Link, useLocation } from "wouter";
 import { ROUTES } from "@/constants";
 import { cn } from "@/lib/utils";
-import { Users, Search, LayoutDashboard, Compass, Menu } from "lucide-react";
-import { ResetDemoDataDialog } from "@/components/reset-data-dialog";
+import { Users, Search, LayoutDashboard, Compass, Menu, CircleHelp, Inbox } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useAllRequests } from "@/hooks/use-requests";
 
 export function Navbar() {
   const [location] = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { requests } = useAllRequests();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +24,7 @@ export function Navbar() {
     { href: ROUTES.search, label: "Search", icon: Search },
     { href: ROUTES.dashboard, label: "Dashboard", icon: LayoutDashboard },
     { href: ROUTES.available, label: "Available", icon: Compass },
+    { href: ROUTES.requests, label: "Requests", icon: Inbox, badge: requests.length },
   ];
 
   return (
@@ -52,7 +54,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                    "relative flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                     isActive 
                       ? "bg-muted text-foreground" 
                       : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
@@ -60,6 +62,11 @@ export function Navbar() {
                 >
                   <Icon className="w-4 h-4" />
                   {link.label}
+                  {link.badge !== undefined && link.badge > 0 && (
+                    <span className="absolute -top-1 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                      {link.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -116,7 +123,7 @@ export function Navbar() {
                         href={link.href}
                         onClick={() => setMobileMenuOpen(false)}
                         className={cn(
-                          "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                          "relative flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                           isActive 
                             ? "bg-primary/10 text-primary" 
                             : "text-muted-foreground hover:bg-muted"
@@ -124,6 +131,11 @@ export function Navbar() {
                       >
                         <Icon className="w-5 h-5" />
                         {link.label}
+                        {link.badge !== undefined && link.badge > 0 && (
+                          <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                            {link.badge}
+                          </span>
+                        )}
                       </Link>
                     );
                   })}
@@ -135,7 +147,7 @@ export function Navbar() {
                       location === ROUTES.about ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
                     )}
                   >
-                    <Compass className="w-5 h-5" />
+                    <CircleHelp className="w-5 h-5" />
                     About
                   </Link>
                   
@@ -170,7 +182,6 @@ export function Footer() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <ResetDemoDataDialog />
           <Link href={ROUTES.about} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
             About Project
           </Link>

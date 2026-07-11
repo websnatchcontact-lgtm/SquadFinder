@@ -28,13 +28,15 @@ export const ROUTES = {
   dashboard: '/dashboard',
   search: '/search',
   available: '/available',
+  requests: '/requests',
   about: '/about',
 } as const;
 
 export const LOCAL_STORAGE_KEYS = {
-  lookingForGroup: 'squadfinder:looking-for-group',
-  createdGroups: 'squadfinder:created-groups',
-  requests: 'squadfinder:join-requests',
-  confirmations: 'squadfinder:confirmations',
-  notes: 'squadfinder:group-notes',
+  lookingForGroup: 'squadfinder-prod:looking-for-group',
+  createdGroups: 'squadfinder-prod:created-groups',
+  requests: 'squadfinder-prod:join-requests',
+  confirmations: 'squadfinder-prod:confirmations',
+  notes: 'squadfinder-prod:group-notes',
+  hideAnnouncement: 'squadfinder-prod:hide-announcement',
 } as const;

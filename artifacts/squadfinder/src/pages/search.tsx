@@ -9,7 +9,7 @@ import { useStudents } from "@/hooks/use-students";
 import { useGroup as useGroupFull } from "@/hooks/use-groups";
 import { useGroupActions } from "@/hooks/use-group-actions";
 import { EmptyState } from "@/components/empty-state";
-import { Search, Loader2, UserPlus, Compass, Link } from "lucide-react";
+import { Search, Loader2, UserPlus, Compass, Link, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ROUTES, SPECIALIZATION_LIST, DIVISION_LIST } from "@/constants";
@@ -28,6 +28,7 @@ const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   specialization: z.enum(["CS", "AIML"]),
   division: z.enum(["A", "B"]),
+  pin: z.string().min(4, "PIN must be at least 4 characters").max(8, "PIN must be at most 8 characters").regex(/^[a-zA-Z0-9]+$/, "PIN can only contain letters and numbers"),
 });
 
 export default function SearchPage() {
@@ -35,6 +36,7 @@ export default function SearchPage() {
   const { results, isSearching } = useSearch(query);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
+  const [registerError, setRegisterError] = useState<string | null>(null);
 
   const showResults = query.trim().length > 0;
   
@@ -43,7 +45,7 @@ export default function SearchPage() {
   const { confirm } = useGroupActions();
 
   const { register } = useRegisterLookingForGroup();
-  const { refresh: refreshStudents } = useStudents();
+  const { students, refresh: refreshStudents } = useStudents();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,11 +55,13 @@ export default function SearchPage() {
       name: "",
       specialization: "CS",
       division: "A",
+      pin: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setRegisterError(null);
       register(values);
       refreshStudents();
       toast({
@@ -67,12 +71,8 @@ export default function SearchPage() {
       setIsRegisterOpen(false);
       setQuery(values.enrollment);
       form.reset();
-    } catch (e) {
-      toast({
-        title: "Error",
-        description: "Failed to register.",
-        variant: "destructive"
-      });
+    } catch (e: any) {
+      setRegisterError(e.message || "Failed to register.");
     }
   }
 
@@ -102,11 +102,10 @@ export default function SearchPage() {
 
         <div className="w-full max-w-2xl relative mb-12">
           <div className="relative group">
-            <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:bg-primary/30 transition-colors opacity-50"></div>
             <SearchInput 
               placeholder="Search by Name or Enrollment Number..." 
-              className="h-16 text-lg pl-14 rounded-2xl shadow-lg border-primary/20 bg-background relative z-10"
-              icon={isSearching ? <Loader2 className="h-6 w-6 animate-spin text-primary" /> : <Search className="h-6 w-6 text-primary" />}
+              className="h-16 text-lg pl-14 rounded-2xl shadow-sm border-border/60 bg-background relative z-10 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary/20"
+              icon={isSearching ? <Loader2 className="h-6 w-6 animate-spin text-primary" /> : <Search className="h-6 w-6 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -117,7 +116,7 @@ export default function SearchPage() {
           </div>
 
           {showResults && results.length > 1 && !studentMatch && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-card border rounded-xl shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border/60 rounded-xl shadow-lg overflow-hidden z-20 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="max-h-80 overflow-y-auto p-2 flex flex-col gap-1">
                 <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Select a student ({results.length} matches)
@@ -151,7 +150,16 @@ export default function SearchPage() {
         </div>
 
         <div className="w-full">
-          {!showResults ? (
+          {students.length === 0 ? (
+            <div className="opacity-60 grayscale-[50%] pointer-events-none transition-opacity duration-500">
+              <EmptyState 
+                icon={<UserPlus className="w-8 h-8" />}
+                title="No students are currently registered."
+                description="Register the first student to start building the roster."
+                className="bg-transparent border-none"
+              />
+            </div>
+          ) : !showResults ? (
             <div className="opacity-60 grayscale-[50%] pointer-events-none transition-opacity duration-500">
               <EmptyState 
                 icon={<Search className="w-8 h-8" />}
@@ -243,7 +251,10 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <Dialog open={isRegisterOpen} onOpenChange={setIsRegisterOpen}>
+      <Dialog open={isRegisterOpen} onOpenChange={(open) => {
+        setIsRegisterOpen(open);
+        if (!open) setRegisterError(null);
+      }}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Looking for a Group</DialogTitle>
@@ -251,6 +262,13 @@ export default function SearchPage() {
               Add yourself to the available students list so other teams can find you.
             </DialogDescription>
           </DialogHeader>
+
+          {registerError && (
+            <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-start gap-2 mt-2">
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+              <p>{registerError}</p>
+            </div>
+          )}
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
@@ -322,6 +340,22 @@ export default function SearchPage() {
                   )}
                 />
               </div>
+              <FormField
+                control={form.control}
+                name="pin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Safety PIN</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. 1234 or ABCD" {...field} />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground mt-2 font-medium bg-muted/50 p-2 rounded border leading-relaxed">
+                    Create a Safety PIN. You'll need this PIN if you want to remove yourself from the Available Students list or revoke any join requests you've submitted in the future. Since this application does not require login, this PIN helps verify that only you can manage your requests.
+                  </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div className="pt-4 flex justify-end">
                 <Button type="submit" className="w-full">Register Availability</Button>
               </div>

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 export function ConflictCard({ conflict }: { conflict: ConflictRecord }) {
   return (
-    <Card className="border-l-4 border-l-destructive shadow-sm">
+    <Card className="border-l-4 border-l-destructive shadow-sm hover:shadow-md transition-shadow duration-300">
       <CardContent className="p-5 flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div>

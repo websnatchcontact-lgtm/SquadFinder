@@ -6,9 +6,11 @@ import Home from '@/pages/home';
 import SearchPage from '@/pages/search';
 import Dashboard from '@/pages/dashboard';
 import Available from '@/pages/available';
+import RequestsPage from '@/pages/requests';
 import About from '@/pages/about';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AnnouncementModal } from '@/components/announcement-modal';
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,7 @@ function Router() {
       <Route path="/search" component={SearchPage} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/available" component={Available} />
+      <Route path="/requests" component={RequestsPage} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>
@@ -36,6 +39,7 @@ function App() {
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>
+      <AnnouncementModal />
     </ThemeProvider>
   );
 }

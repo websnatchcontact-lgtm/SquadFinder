@@ -81,13 +81,6 @@ export function GroupFilterBar({ filters, setFilters, sortKey, setSortKey }: Gro
             >
               Open Seats
             </Badge>
-            <Badge 
-              variant={filters.hasPendingRequests ? "default" : "outline"} 
-              className="cursor-pointer"
-              onClick={() => toggleBooleanFilter('hasPendingRequests')}
-            >
-              Has Requests
-            </Badge>
           </div>
         </div>
 

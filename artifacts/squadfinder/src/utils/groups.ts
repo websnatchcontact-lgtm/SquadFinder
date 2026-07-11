@@ -36,7 +36,6 @@ export function filterGroups(groups: Group[], filters: GroupFilters): Group[] {
     if (filters.health && group.health !== filters.health) return false;
     if (filters.hasOpenSeats && group.seatsLeft === 0) return false;
     if (filters.isFull && !group.isFull) return false;
-    if (filters.hasPendingRequests && group.requests.length === 0) return false;
     return true;
   });
 }

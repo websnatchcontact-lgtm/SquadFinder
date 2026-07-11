@@ -91,16 +91,3 @@ export function setLookingForGroup(students: Student[]): void {
   writeJson(LOCAL_STORAGE_KEYS.lookingForGroup, students);
 }
 
-/**
- * Restores the application to its original state: removes every locally
- * created group, request, confirmation, note, and "looking for a group"
- * entry. The original demo dataset (students.json) is never touched.
- */
-export function resetDemoData(): void {
-  if (typeof window === 'undefined') return;
-  window.localStorage.removeItem(LOCAL_STORAGE_KEYS.createdGroups);
-  window.localStorage.removeItem(LOCAL_STORAGE_KEYS.requests);
-  window.localStorage.removeItem(LOCAL_STORAGE_KEYS.confirmations);
-  window.localStorage.removeItem(LOCAL_STORAGE_KEYS.notes);
-  window.localStorage.removeItem(LOCAL_STORAGE_KEYS.lookingForGroup);
-}

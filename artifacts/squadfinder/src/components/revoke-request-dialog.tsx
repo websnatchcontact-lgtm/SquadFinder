@@ -1,0 +1,99 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import { useGroupActions } from "@/hooks/use-group-actions";
+import { useGroups } from "@/hooks/use-groups";
+import { useStatistics } from "@/hooks/use-statistics";
+import { useToast } from "@/hooks/use-toast";
+import type { JoinRequest } from "@/types";
+
+interface RevokeRequestDialogProps {
+  request: JoinRequest | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeRequestDialogProps) {
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { revoke } = useGroupActions();
+  const { refresh: refreshGroups } = useGroups();
+  const { refresh: refreshStats } = useStatistics();
+  const { toast } = useToast();
+
+  const handleRevoke = () => {
+    if (!request) return;
+    
+    if (pin !== request.pin) {
+      setError("The Safety PIN you entered is incorrect.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      revoke(request.groupNumber, request.id);
+      refreshGroups();
+      refreshStats();
+      toast({
+        title: "Request Revoked",
+        description: "Your join request has been successfully removed.",
+      });
+      handleClose();
+    } catch (e) {
+      setError("An error occurred while revoking the request.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    setTimeout(() => {
+      setPin("");
+      setError(null);
+    }, 200);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Revoke Join Request</DialogTitle>
+          <DialogDescription>
+            Enter your Safety PIN to verify that you are the person who submitted this request.
+          </DialogDescription>
+        </DialogHeader>
+
+        {error && (
+          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <div className="space-y-4 py-2">
+          <Input
+            type="password"
+            placeholder="Enter your Safety PIN"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+            autoFocus
+          />
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleRevoke} disabled={!pin || isSubmitting}>
+              {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Revoke Request
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

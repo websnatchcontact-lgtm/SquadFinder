@@ -10,7 +10,6 @@ import {
   validateCreateGroupInput,
   validateRequestToJoin,
 } from '@/services/group.service';
-import { resetDemoData } from '@/services/storage.service';
 import type { CreateGroupInput, Group, RequestToJoinInput, ValidationResult } from '@/types';
 
 /**
@@ -63,9 +62,6 @@ export function useGroupActions() {
     revokeRequest(groupNumber, requestId);
   }, []);
 
-  const reset = useCallback(() => {
-    resetDemoData();
-  }, []);
 
   return {
     validateCreate,
@@ -77,6 +73,5 @@ export function useGroupActions() {
     confirm,
     saveNotes,
     revoke,
-    reset,
   };
 }

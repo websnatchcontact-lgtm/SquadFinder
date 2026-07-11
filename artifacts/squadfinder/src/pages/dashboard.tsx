@@ -4,14 +4,14 @@ import { useGroups } from "@/hooks/use-groups";
 import { SkeletonStats } from "@/components/loading-skeleton";
 import { StatCard } from "@/components/stat-card";
 import { Users, Layers, Users2, AlertCircle, Search, Compass, ShieldAlert } from "lucide-react";
+import { RevokeRequestDialog } from "@/components/revoke-request-dialog";
 import { GroupCard } from "@/components/group-card";
 import { useState, useMemo } from "react";
 import { SearchInput } from "@/components/ui/search-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { StudentCard } from "@/components/student-card";
-import { Group, GroupFilters, GroupSortKey } from "@/types";
+import { Group, GroupFilters, GroupSortKey, JoinRequest } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
@@ -44,7 +44,7 @@ export default function Dashboard() {
   const [requestJoinGroup, setRequestJoinGroup] = useState<Group | null>(null);
   const [editingNotes, setEditingNotes] = useState(false);
   const [noteValue, setNoteValue] = useState("");
-  const [revokeConfirmOpen, setRevokeConfirmOpen] = useState<string | null>(null);
+  const [revokeRequest, setRevokeRequest] = useState<JoinRequest | null>(null);
 
   const displayGroups = useMemo(() => {
     let result = groups;
@@ -62,24 +62,6 @@ export default function Dashboard() {
     result = sortGroups(result, sortKey);
     return result;
   }, [groups, searchQuery, filters, sortKey]);
-
-  const handleRevoke = (reqId: string) => {
-    if (!selectedGroup) return;
-    revoke(selectedGroup.groupNumber, reqId);
-    refreshGroups();
-    refreshStats();
-    refreshConflicts();
-    toast({ title: "Join request revoked successfully." });
-    
-    setSelectedGroup(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        requests: prev.requests.filter(r => r.id !== reqId),
-      };
-    });
-    setRevokeConfirmOpen(null);
-  };
 
   return (
     <Layout>
@@ -137,17 +119,28 @@ export default function Dashboard() {
           )}
         </section>
 
-        {!conflictsLoading && conflicts.length > 0 && (
+        {!conflictsLoading && (
           <section className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
-              <ShieldAlert className="w-6 h-6 text-destructive" />
+              <ShieldAlert className={`w-6 h-6 ${conflicts.length > 0 ? 'text-destructive' : 'text-muted-foreground'}`} />
               <h2 className="text-2xl font-bold tracking-tight">Conflict Center</h2>
-              <Badge variant="destructive" className="ml-2 rounded-full px-2.5">{conflicts.length}</Badge>
+              {conflicts.length > 0 && <Badge variant="destructive" className="ml-2 rounded-full px-2.5">{conflicts.length}</Badge>}
             </div>
-            <p className="text-muted-foreground">These students appear in multiple groups and must resolve their status.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {conflicts.map(c => <ConflictCard key={c.enrollment} conflict={c} />)}
-            </div>
+            
+            {conflicts.length > 0 ? (
+              <>
+                <p className="text-muted-foreground">These students appear in multiple groups and must resolve their status.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {conflicts.map(c => <ConflictCard key={c.enrollment} conflict={c} />)}
+                </div>
+              </>
+            ) : (
+              <div className="py-8 text-center border border-border/60 border-dashed rounded-2xl bg-card shadow-sm">
+                <ShieldAlert className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold">No conflicts detected.</h3>
+                <p className="text-muted-foreground mt-1">All student group assignments are valid.</p>
+              </div>
+            )}
           </section>
         )}
 
@@ -177,10 +170,16 @@ export default function Dashboard() {
                 <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />
               ))}
             </div>
-          ) : displayGroups.length === 0 ? (
-            <div className="py-20 text-center border rounded-2xl bg-card">
+          ) : groups.length === 0 ? (
+            <div className="py-20 text-center border border-border/60 border-dashed rounded-2xl bg-card shadow-sm">
               <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold">No groups found</h3>
+              <h3 className="text-lg font-semibold">No groups have been created yet.</h3>
+              <p className="text-muted-foreground mt-1">Create your first group to get started.</p>
+            </div>
+          ) : displayGroups.length === 0 ? (
+            <div className="py-20 text-center border border-border/60 border-dashed rounded-2xl bg-card shadow-sm">
+              <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+              <h3 className="text-lg font-semibold">No groups available.</h3>
               <p className="text-muted-foreground mt-1">Try adjusting your filters or search query.</p>
             </div>
           ) : (
@@ -303,7 +302,7 @@ export default function Dashboard() {
                                 variant="outline" 
                                 size="sm" 
                                 className="h-6 text-xs px-2 text-destructive border-destructive/30 hover:bg-destructive hover:text-destructive-foreground"
-                                onClick={() => setRevokeConfirmOpen(req.id)}
+                                onClick={() => setRevokeRequest(req)}
                               >
                                 Revoke Request
                               </Button>
@@ -354,22 +353,11 @@ export default function Dashboard() {
           )}
         </DialogContent>
       </Dialog>
-      <AlertDialog open={!!revokeConfirmOpen} onOpenChange={(open) => !open && setRevokeConfirmOpen(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Withdraw Request?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to revoke this join request? This action will remove your request from the target group.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => revokeConfirmOpen && handleRevoke(revokeConfirmOpen)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Revoke Request
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <RevokeRequestDialog 
+        request={revokeRequest} 
+        open={!!revokeRequest} 
+        onOpenChange={(open) => !open && setRevokeRequest(null)} 
+      />
     </Layout>
   );
 }

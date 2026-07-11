@@ -22,6 +22,7 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
   const [division, setDivision] = useState<DivisionCode>("A");
   const [specialization, setSpecialization] = useState<SpecializationCode>("CS");
   const [note, setNote] = useState("");
+  const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [conflictConfirmOpen, setConflictConfirmOpen] = useState(false);
 
@@ -29,11 +30,20 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
   const { refresh: refreshGroups } = useGroups();
   const { refresh: refreshStats } = useStatistics();
   const { refresh: refreshConflicts } = useConflicts();
-  const { refresh: refreshStudents } = useStudents();
+  const { students, refresh: refreshStudents } = useStudents();
   const { toast } = useToast();
 
+  const registeredStudent = students.find(s => s.enrollment === enrollment && s.pin);
+  const isRegistered = !!registeredStudent;
+
   const validateAndSubmit = () => {
-    const input: RequestToJoinInput = { name, enrollment, division, specialization, note };
+    const finalPin = isRegistered ? registeredStudent.pin! : pin;
+    if (!finalPin || finalPin.length < 4) {
+      setError("Please enter a valid Safety PIN (at least 4 characters).");
+      return;
+    }
+    
+    const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin: finalPin };
     const validation = validateJoin(group, input);
     if (!validation.valid) {
       setError(validation.message || "Invalid input");
@@ -49,7 +59,8 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
   };
 
   const doSubmit = () => {
-    const input: RequestToJoinInput = { name, enrollment, division, specialization, note };
+    const finalPin = isRegistered ? registeredStudent.pin! : pin;
+    const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin: finalPin };
     try {
       submitRequestToJoin(group.groupNumber, input);
       refreshGroups();
@@ -71,6 +82,7 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
       setDivision("A");
       setSpecialization("CS");
       setNote("");
+      setPin("");
       setError(null);
     }, 200);
   };
@@ -131,6 +143,20 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
                 className="resize-none h-20"
               />
             </div>
+            {!isRegistered && (
+              <div className="space-y-2">
+                <Label>Safety PIN</Label>
+                <Input 
+                  value={pin} 
+                  onChange={e => setPin(e.target.value)} 
+                  placeholder="Create or enter your PIN" 
+                  type="password"
+                />
+                <p className="text-[10px] text-muted-foreground leading-tight">
+                  This PIN is required to revoke your request later.
+                </p>
+              </div>
+            )}
             <Button onClick={validateAndSubmit} className="w-full mt-2">Submit Request</Button>
           </div>
         </DialogContent>
