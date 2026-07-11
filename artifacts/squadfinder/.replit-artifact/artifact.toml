@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "SquadFinder"
+version = "1.0.0"
+id = "artifacts/squadfinder"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20562
+
+[services.development]
+run = "pnpm --filter @workspace/squadfinder run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/squadfinder", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/squadfinder/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20562"
+BASE_PATH = "/"
