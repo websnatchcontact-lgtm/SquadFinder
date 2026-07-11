@@ -1,0 +1,765 @@
+# ============================================================================
+# ENTERPRISE PRODUCT SPECIFICATION
+# PART 3 — TECHNICAL ARCHITECTURE & DEVELOPMENT STANDARDS
+# ============================================================================
+
+# DEVELOPMENT PRINCIPLE
+
+This is NOT a quick prototype.
+
+This is a production-quality frontend application.
+
+Write code that a Senior Frontend Engineer would be proud to maintain.
+
+Every component should be reusable.
+
+Every file should have a single responsibility.
+
+Avoid duplicate logic.
+
+Follow modern React and Next.js best practices.
+
+------------------------------------------------------------------------------
+
+# TECHNOLOGY STACK
+
+Framework
+• Next.js 15 (App Router)
+
+Language
+• TypeScript (Strict Mode)
+
+Styling
+• Tailwind CSS
+
+UI Library
+• shadcn/ui
+
+Icons
+• Lucide React
+
+Animation
+• Framer Motion
+
+Fonts
+• Geist
+• Fallback: Inter
+
+Package Manager
+• npm
+
+Linting
+• ESLint
+
+Formatting
+• Prettier
+
+Deployment Target
+• Vercel
+
+------------------------------------------------------------------------------
+
+# PROJECT STRUCTURE
+
+Use the following folder structure:
+
+app/
+    layout.tsx
+    page.tsx
+    dashboard/
+    search/
+    available/
+    about/
+
+components/
+    layout/
+    navigation/
+    dashboard/
+    cards/
+    search/
+    groups/
+    students/
+    animations/
+    ui/
+
+hooks/
+
+lib/
+
+services/
+
+types/
+
+utils/
+
+constants/
+
+data/
+
+public/
+
+styles/
+
+README.md
+
+------------------------------------------------------------------------------
+
+# COMPONENT ARCHITECTURE
+
+Every UI element should be reusable.
+
+Examples
+
+Button
+
+Card
+
+Badge
+
+Avatar
+
+Modal
+
+Dialog
+
+SearchBar
+
+StatisticsCard
+
+GroupCard
+
+StudentCard
+
+SectionHeading
+
+Navbar
+
+Footer
+
+EmptyState
+
+LoadingSkeleton
+
+Toast
+
+Illustration
+
+HeroSection
+
+FeatureCard
+
+HowItWorks
+
+DashboardPreview
+
+These components should NEVER duplicate code.
+
+------------------------------------------------------------------------------
+
+# PAGE STRUCTURE
+
+Home
+
+Dashboard
+
+Search
+
+Available Students
+
+About
+
+404
+
+Each page should have
+
+SEO metadata
+
+Proper layout
+
+Page transitions
+
+Loading state
+
+Error state
+
+------------------------------------------------------------------------------
+
+# DATA LAYER
+
+All data initially comes from
+
+/data/students.json
+
+Never hardcode student data inside components.
+
+Components should receive data through props.
+
+Separate business logic from UI.
+
+------------------------------------------------------------------------------
+
+# STUDENT JSON SCHEMA
+
+Every student object should include:
+
+Enrollment Number
+
+Student Name
+
+Specialization
+
+Group Number
+
+Status
+
+Example
+
+{
+  "enrollment":"23IT001",
+  "name":"John Doe",
+  "specialization":"CS",
+  "group":"A12",
+  "status":"GROUPED"
+}
+
+Status values
+
+GROUPED
+
+FREE
+
+MISMATCH
+
+------------------------------------------------------------------------------
+
+# GROUP MODEL
+
+Groups should be dynamically generated.
+
+Do NOT create a separate groups.json.
+
+Instead,
+
+Read all students.
+
+Group them using
+
+groupNumber.
+
+Calculate
+
+Total Members
+
+Available Seats
+
+Full Status
+
+Specialization Count
+
+Automatically.
+
+------------------------------------------------------------------------------
+
+# BUSINESS LOGIC
+
+Create reusable helper functions.
+
+Examples
+
+Find Student
+
+Find Group
+
+Calculate Seats
+
+Calculate Statistics
+
+Count Specializations
+
+Generate Dashboard Data
+
+Search Student
+
+Never place this logic directly inside components.
+
+------------------------------------------------------------------------------
+
+# LOCAL STORAGE
+
+Use Local Storage ONLY for
+
+Students who click
+
+"I'm Looking For A Group"
+
+Store
+
+Enrollment
+
+Name
+
+Specialization
+
+Timestamp
+
+Load Local Storage
+
+Merge with JSON
+
+Display inside dashboard.
+
+Never overwrite original JSON.
+
+------------------------------------------------------------------------------
+
+# SEARCH SYSTEM
+
+Create reusable search utility.
+
+Requirements
+
+Fast
+
+Case insensitive
+
+Trim whitespace
+
+Instant filtering
+
+Highlight matched text
+
+Keyboard support
+
+Press Enter
+
+Escape clears results
+
+Arrow keys navigate suggestions
+
+------------------------------------------------------------------------------
+
+# SERVICES
+
+Create services
+
+student.service.ts
+
+Should contain
+
+Load Students
+
+Search Student
+
+Get Student
+
+Get Group
+
+Get Dashboard Statistics
+
+Get Available Students
+
+Do NOT call JSON directly from pages.
+
+------------------------------------------------------------------------------
+
+# TYPES
+
+Create proper interfaces.
+
+Student
+
+Group
+
+DashboardStats
+
+SearchResult
+
+AvailableStudent
+
+Status
+
+Specialization
+
+Avoid using "any".
+
+------------------------------------------------------------------------------
+
+# CUSTOM HOOKS
+
+Create reusable hooks.
+
+Examples
+
+useStudents()
+
+useSearch()
+
+useLocalStorage()
+
+useStatistics()
+
+useGroup()
+
+Keep business logic inside hooks.
+
+------------------------------------------------------------------------------
+
+# UTILITIES
+
+Create utility functions.
+
+calculateSeats()
+
+groupStudents()
+
+countBranches()
+
+formatStatus()
+
+generateInitials()
+
+searchStudents()
+
+sortGroups()
+
+sortStudents()
+
+------------------------------------------------------------------------------
+
+# CONSTANTS
+
+Create reusable constants.
+
+Status Colors
+
+Branch Colors
+
+Maximum Members
+
+Minimum Members
+
+Routes
+
+Animations
+
+Icons
+
+------------------------------------------------------------------------------
+
+# CODE QUALITY
+
+Strict TypeScript
+
+No any
+
+Meaningful variable names
+
+Reusable logic
+
+Proper comments where necessary
+
+No deeply nested components
+
+Prefer composition over duplication
+
+------------------------------------------------------------------------------
+
+# PERFORMANCE
+
+Lazy load heavy sections.
+
+Optimize re-renders.
+
+Use memoization where appropriate.
+
+Avoid unnecessary state.
+
+Keep bundle clean.
+
+------------------------------------------------------------------------------
+
+# RESPONSIVE LAYOUT
+
+Desktop
+
+1440px+
+
+Laptop
+
+1024px+
+
+Tablet
+
+768px+
+
+Mobile
+
+390px+
+
+Cards should adapt naturally.
+
+Never break layout.
+
+------------------------------------------------------------------------------
+
+# ERROR HANDLING
+
+Professional error messages.
+
+Graceful empty states.
+
+Never crash UI.
+
+Handle
+
+Missing JSON
+
+Invalid Data
+
+Search Failures
+
+No Results
+
+------------------------------------------------------------------------------
+
+# ACCESSIBILITY
+
+Keyboard navigation
+
+Semantic HTML
+
+ARIA labels
+
+Proper button types
+
+Alt text
+
+Visible focus states
+
+Logical tab order
+
+------------------------------------------------------------------------------
+
+# ANIMATION ARCHITECTURE
+
+Create reusable animation wrappers.
+
+Examples
+
+FadeIn
+
+SlideUp
+
+ScaleIn
+
+StaggerChildren
+
+HoverCard
+
+FloatingAnimation
+
+PageTransition
+
+Reuse these animations.
+
+------------------------------------------------------------------------------
+
+# DESIGN TOKENS
+
+Maintain consistent
+
+Spacing
+
+Radius
+
+Shadow
+
+Typography
+
+Colors
+
+Animation Duration
+
+Transition Curves
+
+Do not hardcode values repeatedly.
+
+------------------------------------------------------------------------------
+
+# DASHBOARD DATA
+
+Dashboard should calculate automatically
+
+Total Students
+
+Grouped Students
+
+Available Students
+
+Mismatch Students
+
+Total Groups
+
+Groups Full
+
+Groups With Empty Seats
+
+CS Students
+
+AI/ML Students
+
+Mixed Groups
+
+Average Group Size
+
+Largest Group
+
+Smallest Group
+
+Available Seats Remaining
+
+These values should always be derived from data.
+
+------------------------------------------------------------------------------
+
+# GROUP DETAILS
+
+Each Group Card should display
+
+Group Number
+
+Members
+
+Branch Distribution
+
+Seats Left
+
+Status
+
+Click
+
+Open detailed modal
+
+Modal contains
+
+Avatar
+
+Name
+
+Enrollment
+
+Branch
+
+Status
+
+Professional layout.
+
+------------------------------------------------------------------------------
+
+# SEARCH RESULT
+
+Result Card
+
+Avatar
+
+Name
+
+Enrollment
+
+Branch
+
+Group
+
+Status
+
+Members
+
+Seats Left
+
+Animation
+
+Professional spacing.
+
+------------------------------------------------------------------------------
+
+# README
+
+Include
+
+Project Overview
+
+Features
+
+Architecture
+
+Folder Structure
+
+Installation
+
+Development
+
+Deployment
+
+Future Improvements
+
+Tech Stack
+
+Screenshots placeholder
+
+License
+
+Acknowledgements
+
+------------------------------------------------------------------------------
+
+# TESTING PREPARATION
+
+Code should be structured so unit testing can easily be added later.
+
+Business logic should remain independent from UI.
+
+------------------------------------------------------------------------------
+
+# FUTURE SCALABILITY
+
+Design the application so it can later support:
+
+Google Sheets
+
+REST API
+
+Supabase
+
+Firebase
+
+PostgreSQL
+
+MongoDB
+
+Authentication
+
+Admin Dashboard
+
+Without major architectural changes.
+
+------------------------------------------------------------------------------
+
+# FINAL DEVELOPMENT RULES
+
+DO NOT generate placeholder components.
+
+DO NOT leave TODO comments.
+
+DO NOT use dummy lorem ipsum text.
+
+DO NOT generate duplicate code.
+
+DO NOT create unnecessarily large files.
+
+Prefer reusable, modular components.
+
+Ensure the codebase is easy to understand, maintain, and extend.
+
+The final output should feel like it was built by a professional software engineering team following modern frontend architecture standards.
+
+# END OF PART 3

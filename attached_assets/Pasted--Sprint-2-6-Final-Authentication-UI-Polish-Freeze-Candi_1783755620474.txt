@@ -1,0 +1,190 @@
+# Sprint 2.6 – Final Authentication UI Polish (Freeze Candidate)
+
+Context
+
+Sprint 2.6 (Authentication & Authorization) is feature complete.
+
+Do NOT add any new features.
+
+Do NOT modify authentication logic.
+
+Do NOT modify Better Auth configuration.
+
+Do NOT modify middleware, authorization flow, database schema, sessions, cookies, redirects, or API behavior.
+
+This task is strictly a UI/UX polish pass before Sprint 2.6 is officially frozen.
+
+---
+
+Objectives
+
+Perform a comprehensive visual audit of all Authentication and Account Approval pages.
+
+Pages include (but are not limited to):
+
+- Sign In
+- Sign Up
+- Forgot Password
+- Reset Password
+- Verify Email
+- Approval Pending
+- Approval Rejected
+- Approval Suspended
+
+---
+
+Task 1 — Fix Dark Theme Button Visibility
+
+Current issue:
+
+On dark theme, the "Sign Out" button on Approval pages becomes nearly invisible because its border/text colors do not provide enough contrast.
+
+Requirements:
+
+- Make the Sign Out button fully visible in Dark Mode.
+- Keep the existing design language.
+- Do NOT introduce custom colors if theme variables already exist.
+- Use Bootstrap/theme utility classes whenever possible.
+- Ensure hover, active, disabled and focus states are all visible.
+
+---
+
+Task 2 — Full Theme Audit
+
+Inspect every authentication page for:
+
+✓ Text contrast
+
+✓ Button contrast
+
+✓ Link visibility
+
+✓ Placeholder colors
+
+✓ Disabled states
+
+✓ Input focus
+
+✓ Input borders
+
+✓ Validation colors
+
+✓ Alert colors
+
+✓ Toast visibility
+
+✓ Spinner visibility
+
+✓ Card backgrounds
+
+✓ Shadows
+
+✓ Dividers
+
+✓ Icons
+
+✓ SVG visibility
+
+✓ Password visibility toggle icon
+
+Everything should look correct in BOTH:
+
+- Light Theme
+- Dark Theme
+
+---
+
+Task 3 — Responsive Audit
+
+Verify layouts on:
+
+320px
+
+375px
+
+425px
+
+768px
+
+1024px
+
+1440px
+
+Ensure:
+
+- No overflow
+- No clipped buttons
+- No broken spacing
+- No overlapping text
+- No layout shifts
+- Proper button widths
+- Correct alignment
+
+---
+
+Task 4 — Accessibility Audit
+
+Verify:
+
+- Keyboard navigation
+- Focus rings
+- Tab order
+- Button labels
+- Contrast ratios
+- Disabled buttons
+- Loading states
+
+---
+
+Task 5 — Code Cleanup
+
+Remove:
+
+- Unused imports
+- Duplicate CSS classes
+- Dead styles
+- Redundant wrappers
+
+Do NOT refactor business logic.
+
+---
+
+Task 6 — Verification
+
+Run:
+
+npx tsc --noEmit
+
+npm run build
+
+Confirm:
+
+✅ TypeScript passes
+
+✅ Production build passes
+
+---
+
+Task 7 — Report
+
+Provide a final report containing ONLY:
+
+1. Files modified
+
+2. UX issues fixed
+
+3. Responsive verification
+
+4. Accessibility verification
+
+5. Build status
+
+6. TypeScript status
+
+7. Remaining issues (if any)
+
+Do not modify documentation unless absolutely necessary.
+
+Goal:
+
+This is the FINAL UI polish before Sprint 2.6 is permanently frozen.

@@ -1,0 +1,902 @@
+# ============================================================================
+# ENTERPRISE PRODUCT SPECIFICATION
+# PART 2 — UI/UX DESIGN SYSTEM, BRANDING & APPLICATION DESIGN
+# ============================================================================
+
+# BRAND IDENTITY
+
+Product Name
+
+SquadFinder
+
+Tagline
+
+Find Your Capstone Team, Faster.
+
+Subtitle
+
+Built for GLS University Students
+
+Brand Personality
+
+• Modern
+• Friendly
+• Clean
+• Premium
+• Professional
+• Minimal
+• Student-Centric
+• Trustworthy
+• Fast
+• Intelligent
+
+The application should feel like a real startup product similar in quality to:
+
+• Linear
+• Vercel
+• Notion
+• Stripe Dashboard
+• Raycast
+• Clerk
+• Dropbox
+• GitHub
+
+DO NOT create a typical college project interface.
+
+Everything should look polished and premium.
+
+------------------------------------------------------------------------------
+
+# DESIGN PHILOSOPHY
+
+The UI should communicate:
+
+Clarity
+
+Speed
+
+Trust
+
+Professionalism
+
+Modern Design
+
+Generous white space.
+
+No clutter.
+
+No unnecessary borders.
+
+No bright flashy colors.
+
+Use subtle gradients.
+
+Soft shadows.
+
+Rounded corners.
+
+Elegant animations.
+
+Premium spacing.
+
+The interface should immediately impress the user.
+
+------------------------------------------------------------------------------
+
+# DESIGN SYSTEM
+
+Spacing
+
+Use an 8-point spacing system.
+
+4px
+
+8px
+
+12px
+
+16px
+
+24px
+
+32px
+
+48px
+
+64px
+
+96px
+
+Maintain consistent spacing throughout the application.
+
+------------------------------------------------------------------------------
+
+# BORDER RADIUS
+
+Buttons
+
+14px
+
+Cards
+
+20px
+
+Modals
+
+24px
+
+Inputs
+
+14px
+
+Search Bar
+
+18px
+
+Statistics Cards
+
+22px
+
+------------------------------------------------------------------------------
+
+# SHADOWS
+
+Use subtle layered shadows.
+
+No harsh shadows.
+
+Cards should appear elevated without feeling heavy.
+
+Hover should slightly increase elevation.
+
+------------------------------------------------------------------------------
+
+# COLORS
+
+Primary
+
+Blue
+
+Secondary
+
+Purple
+
+Success
+
+Green
+
+Warning
+
+Orange
+
+Danger
+
+Red
+
+Neutral
+
+Slate
+
+Background
+
+Very light gray with subtle gradients.
+
+Cards
+
+Pure white.
+
+Glass cards
+
+Slight transparency with backdrop blur.
+
+------------------------------------------------------------------------------
+
+# TYPOGRAPHY
+
+Use Geist Font.
+
+If unavailable
+
+Use Inter.
+
+Typography hierarchy
+
+Hero Title
+
+Very Large
+
+Bold
+
+Hero Subtitle
+
+Medium
+
+Soft gray
+
+Section Title
+
+Large
+
+Bold
+
+Card Title
+
+Medium
+
+Semi-bold
+
+Body
+
+Normal
+
+Helper Text
+
+Small
+
+Muted
+
+Statistics
+
+Large bold numbers.
+
+------------------------------------------------------------------------------
+
+# ICONOGRAPHY
+
+Use Lucide React Icons.
+
+Every major card should have an icon.
+
+Examples
+
+Dashboard
+
+Search
+
+Users
+
+Graduation Cap
+
+Layers
+
+Check
+
+Alert Triangle
+
+Sparkles
+
+School
+
+Book
+
+Do not overuse icons.
+
+------------------------------------------------------------------------------
+
+# BRAND LOGO
+
+Create a clean modern logo.
+
+Use
+
+"S"
+
+combined with
+
+People
+
+Connection
+
+Team
+
+Network
+
+The logo should look like something that could belong to a startup.
+
+Do not create cartoon logos.
+
+Keep it minimal.
+
+------------------------------------------------------------------------------
+
+# NAVBAR
+
+Sticky Navbar
+
+Transparent initially.
+
+Blur on scroll.
+
+Contains
+
+Logo
+
+Home
+
+Dashboard
+
+Search
+
+Available Students
+
+About
+
+GitHub Icon
+
+CTA Button
+
+Search My Group
+
+Mobile Navigation
+
+Animated Drawer
+
+Hamburger Animation
+
+Smooth Opening
+
+------------------------------------------------------------------------------
+
+# LANDING PAGE
+
+The landing page should feel premium.
+
+Sections
+
+1.
+
+Hero
+
+Large illustration.
+
+Animated gradient background.
+
+Floating shapes.
+
+Large headline.
+
+Beautiful subtitle.
+
+Primary CTA
+
+Search My Group
+
+Secondary CTA
+
+Explore Dashboard
+
+Statistics Preview
+
+2.
+
+Trusted Section
+
+Display
+
+"Helping GLS students organize Capstone teams."
+
+3.
+
+Feature Cards
+
+Search Groups
+
+Find Teammates
+
+Explore Dashboard
+
+Track Availability
+
+Beautiful icons.
+
+Hover animation.
+
+4.
+
+How It Works
+
+Step 1
+
+Search Enrollment
+
+↓
+
+Step 2
+
+Find Your Team
+
+↓
+
+Step 3
+
+Connect Faster
+
+Timeline layout.
+
+5.
+
+Dashboard Preview
+
+Show a realistic screenshot-style preview.
+
+6.
+
+Footer
+
+Professional.
+
+Minimal.
+
+------------------------------------------------------------------------------
+
+# HERO SECTION
+
+Large headline.
+
+Modern typography.
+
+Gradient accent.
+
+Animated blobs.
+
+Subtle background grid.
+
+Professional illustration.
+
+CTA Buttons
+
+Large.
+
+Rounded.
+
+Hover animations.
+
+------------------------------------------------------------------------------
+
+# SEARCH EXPERIENCE
+
+This should be the best interaction.
+
+Large search input.
+
+Search icon.
+
+Autocomplete.
+
+Keyboard navigation.
+
+Instant suggestions.
+
+Loading skeleton.
+
+Smooth animations.
+
+Placeholder
+
+"Enter your Enrollment Number"
+
+Search should feel like Spotlight Search on macOS.
+
+------------------------------------------------------------------------------
+
+# MY GROUP PAGE
+
+When a student is found
+
+Display a beautiful card.
+
+Top section
+
+Avatar
+
+Name
+
+Enrollment Number
+
+Branch Badge
+
+Group Badge
+
+Status Badge
+
+Middle Section
+
+Members
+
+Each member gets their own card.
+
+Card contains
+
+Avatar
+
+Name
+
+Enrollment Number
+
+Branch
+
+Bottom Section
+
+Summary
+
+Members
+
+Seats Left
+
+Group Status
+
+Professional layout.
+
+------------------------------------------------------------------------------
+
+# TEAM MEMBER CARD
+
+Avatar
+
+Generated from initials.
+
+Large.
+
+Soft gradient background.
+
+Student Name
+
+Enrollment Number
+
+Specialization Badge
+
+Hover animation.
+
+Clickable appearance.
+
+------------------------------------------------------------------------------
+
+# GROUP STATUS
+
+Display beautiful colored badges.
+
+FULL
+
+Green
+
+1 Seat Left
+
+Orange
+
+2 Seats Left
+
+Blue
+
+Looking For Members
+
+Purple
+
+Status badges should look modern.
+
+------------------------------------------------------------------------------
+
+# AVAILABLE STUDENTS PAGE
+
+Beautiful cards.
+
+Each card contains
+
+Avatar
+
+Name
+
+Enrollment Number
+
+Specialization
+
+Available Badge
+
+Professional spacing.
+
+Hover animation.
+
+Search at top.
+
+------------------------------------------------------------------------------
+
+# DASHBOARD
+
+This is the most important page.
+
+Design it like a SaaS Admin Dashboard.
+
+------------------------------------------------------------------------------
+
+Top Statistics
+
+Animated numbers.
+
+Cards
+
+Total Students
+
+Total Groups
+
+Students in Groups
+
+Students Looking
+
+Groups Full
+
+Available Seats
+
+CS Students
+
+AI/ML Students
+
+Every card has
+
+Icon
+
+Number
+
+Label
+
+Gradient
+
+Hover effect
+
+------------------------------------------------------------------------------
+
+# DASHBOARD LAYOUT
+
+Responsive grid.
+
+Large desktop layout.
+
+Mobile cards.
+
+Tablet optimized.
+
+Proper spacing.
+
+------------------------------------------------------------------------------
+
+# GROUP OVERVIEW SECTION
+
+Every group displayed as premium card.
+
+Card contains
+
+Group Number
+
+Status
+
+Member Count
+
+Available Seats
+
+Specialization Distribution
+
+Button
+
+View Details
+
+------------------------------------------------------------------------------
+
+# GROUP DETAILS MODAL
+
+Large modal.
+
+Displays
+
+Group Number
+
+Members
+
+Enrollment Numbers
+
+Specializations
+
+Status
+
+Seats Left
+
+Professional layout.
+
+------------------------------------------------------------------------------
+
+# QUICK SEARCH CARD
+
+Persistent search.
+
+Search any enrollment.
+
+Instant results.
+
+Modern design.
+
+------------------------------------------------------------------------------
+
+# EMPTY STATES
+
+Never leave blank pages.
+
+Use illustrations.
+
+Friendly messages.
+
+Examples
+
+"No matching student found."
+
+"No students currently looking for a team."
+
+"No mismatch records."
+
+Beautiful buttons.
+
+------------------------------------------------------------------------------
+
+# ERROR STATES
+
+Professional.
+
+Friendly.
+
+Helpful.
+
+Never use browser alerts.
+
+------------------------------------------------------------------------------
+
+# SUCCESS STATES
+
+Use toast notifications.
+
+Animated checkmark.
+
+Soft green colors.
+
+Success should feel satisfying.
+
+------------------------------------------------------------------------------
+
+# LOADING STATES
+
+Skeleton cards.
+
+Skeleton statistics.
+
+Skeleton table.
+
+Animated shimmer effect.
+
+------------------------------------------------------------------------------
+
+# MICRO INTERACTIONS
+
+Buttons slightly lift.
+
+Cards elevate.
+
+Search bar expands.
+
+Icons animate.
+
+Statistics count up.
+
+Modals fade.
+
+Page transitions.
+
+Everything should feel alive.
+
+------------------------------------------------------------------------------
+
+# ANIMATIONS
+
+Use Framer Motion.
+
+Page fade.
+
+Slide.
+
+Scale.
+
+Spring animation.
+
+Hover transitions.
+
+Animated gradients.
+
+Floating background shapes.
+
+Animated hero illustration.
+
+Do NOT overdo animations.
+
+Smooth and elegant.
+
+------------------------------------------------------------------------------
+
+# RESPONSIVENESS
+
+Desktop First
+
+Tablet
+
+Mobile
+
+Navigation collapses elegantly.
+
+Cards stack naturally.
+
+Statistics become responsive.
+
+No horizontal scrolling.
+
+------------------------------------------------------------------------------
+
+# ACCESSIBILITY
+
+Keyboard navigation.
+
+Visible focus states.
+
+ARIA labels.
+
+High contrast.
+
+Semantic HTML.
+
+Screen reader friendly.
+
+------------------------------------------------------------------------------
+
+# VISUAL CONSISTENCY
+
+All cards use same radius.
+
+Same spacing.
+
+Same shadows.
+
+Same typography.
+
+Same animation speed.
+
+Consistent color system.
+
+Every page should feel like part of one design system.
+
+------------------------------------------------------------------------------
+
+# BRANDING CONSISTENCY
+
+Use SquadFinder branding everywhere.
+
+Navbar
+
+Footer
+
+README
+
+Browser Title
+
+Favicon
+
+Loading Screen
+
+404 Page
+
+Empty States
+
+Every page should reinforce the brand identity.
+
+------------------------------------------------------------------------------
+
+# FINAL UI REQUIREMENT
+
+The application should never look like a student assignment.
+
+If someone sees only screenshots of the UI, they should assume it is a professionally designed SaaS product built by an experienced product team.
+
+Aim for a Dribbble or Behance-quality interface while keeping the code clean, accessible, and production-ready.
+
+# END OF PART 2
