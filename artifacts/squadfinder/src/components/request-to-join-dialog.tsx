@@ -39,10 +39,6 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
       setError(validation.message || "Invalid input");
       return;
     }
-    if (specialization !== group.specialization) {
-      setError("You must have the same specialization as the group to join it.");
-      return;
-    }
     setError(null);
     
     if (checkJoinDuplicate(enrollment)) {
@@ -106,7 +102,7 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
               <Label>Enrollment Number</Label>
               <Input value={enrollment} onChange={e => setEnrollment(e.target.value)} placeholder="e.g. 21012345" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Division</Label>
                 <Select value={division} onValueChange={(v: DivisionCode) => setDivision(v)}>

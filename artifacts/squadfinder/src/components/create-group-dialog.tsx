@@ -156,7 +156,7 @@ export function CreateGroupDialog({ open, onOpenChange }: { open: boolean, onOpe
                       </Button>
                     )}
                     
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label className="text-xs">Full Name</Label>
                         <Input value={member.name} onChange={e => updateMember(index, 'name', e.target.value)} placeholder="Name" />
@@ -166,7 +166,7 @@ export function CreateGroupDialog({ open, onOpenChange }: { open: boolean, onOpe
                         <Input value={member.enrollment} onChange={e => updateMember(index, 'enrollment', e.target.value)} placeholder="Enrollment #" />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label className="text-xs">Division</Label>
                         <Select value={member.division} onValueChange={v => updateMember(index, 'division', v)}>

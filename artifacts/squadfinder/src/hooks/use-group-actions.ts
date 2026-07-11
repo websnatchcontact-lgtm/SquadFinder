@@ -5,6 +5,7 @@ import {
   createGroup,
   findCrossGroupDuplicates,
   requestToJoin,
+  revokeRequest,
   updateGroupNotes,
   validateCreateGroupInput,
   validateRequestToJoin,
@@ -58,6 +59,10 @@ export function useGroupActions() {
     updateGroupNotes(groupNumber, notes);
   }, []);
 
+  const revoke = useCallback((groupNumber: string, requestId: string) => {
+    revokeRequest(groupNumber, requestId);
+  }, []);
+
   const reset = useCallback(() => {
     resetDemoData();
   }, []);
@@ -71,6 +76,7 @@ export function useGroupActions() {
     submitRequestToJoin,
     confirm,
     saveNotes,
+    revoke,
     reset,
   };
 }

@@ -7,7 +7,7 @@ import type {
   Student,
   ValidationResult,
 } from '@/types';
-import { MAX_GROUP_MEMBERS, MIN_GROUP_MEMBERS } from '@/constants';
+import { MAX_GROUP_MEMBERS, MIN_GROUP_MEMBERS, SPECIALIZATIONS } from '@/constants';
 import { loadBaselineStudents } from '@/services/student.service';
 import {
   getConfirmations,
@@ -230,6 +230,15 @@ export function validateRequestToJoin(
   const enrollmentCheck = validateEnrollment(input.enrollment);
   if (!enrollmentCheck.valid) return enrollmentCheck;
 
+  if (input.specialization !== group.specialization) {
+    const groupLabel = SPECIALIZATIONS[group.specialization].label;
+    const studentLabel = SPECIALIZATIONS[input.specialization].label;
+    return {
+      valid: false,
+      message: `You cannot request to join this group because it belongs to the ${groupLabel} specialization while your specialization is ${studentLabel}. Capstone groups can only contain students from the same specialization.`,
+    };
+  }
+
   const normalized = normalizeEnrollment(input.enrollment);
   if (group.members.some((m) => m.enrollment === normalized)) {
     return { valid: false, message: 'This student has already been added to this group.' };
@@ -270,4 +279,12 @@ export function updateGroupNotes(groupNumber: string, notes: string): void {
   const notesMap = getNotes();
   notesMap[groupNumber] = notes;
   setNotes(notesMap);
+}
+
+/** Withdraws a pending join request. Removes it from Local Storage entirely -- never soft-deleted. */
+export function revokeRequest(groupNumber: string, requestId: string): void {
+  const requestsMap = getRequests();
+  const existing = requestsMap[groupNumber] ?? [];
+  requestsMap[groupNumber] = existing.filter((r) => r.id !== requestId);
+  setRequests(requestsMap);
 }

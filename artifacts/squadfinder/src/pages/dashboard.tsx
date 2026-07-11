@@ -8,6 +8,8 @@ import { GroupCard } from "@/components/group-card";
 import { useState, useMemo } from "react";
 import { SearchInput } from "@/components/ui/search-input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { StudentCard } from "@/components/student-card";
 import { Group, GroupFilters, GroupSortKey } from "@/types";
 import { Badge } from "@/components/ui/badge";
@@ -28,10 +30,11 @@ import { generateInitials } from "@/utils/students";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function Dashboard() {
-  const { stats, isLoading: statsLoading } = useStatistics();
-  const { groups, isLoading: groupsLoading } = useGroups();
-  const { conflicts, isLoading: conflictsLoading } = useConflicts();
-  const { saveNotes } = useGroupActions();
+  const { stats, isLoading: statsLoading, refresh: refreshStats } = useStatistics();
+  const { groups, isLoading: groupsLoading, refresh: refreshGroups } = useGroups();
+  const { conflicts, isLoading: conflictsLoading, refresh: refreshConflicts } = useConflicts();
+  const { saveNotes, revoke } = useGroupActions();
+  const { toast } = useToast();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -41,6 +44,7 @@ export default function Dashboard() {
   const [requestJoinGroup, setRequestJoinGroup] = useState<Group | null>(null);
   const [editingNotes, setEditingNotes] = useState(false);
   const [noteValue, setNoteValue] = useState("");
+  const [revokeConfirmOpen, setRevokeConfirmOpen] = useState<string | null>(null);
 
   const displayGroups = useMemo(() => {
     let result = groups;
@@ -58,6 +62,24 @@ export default function Dashboard() {
     result = sortGroups(result, sortKey);
     return result;
   }, [groups, searchQuery, filters, sortKey]);
+
+  const handleRevoke = (reqId: string) => {
+    if (!selectedGroup) return;
+    revoke(selectedGroup.groupNumber, reqId);
+    refreshGroups();
+    refreshStats();
+    refreshConflicts();
+    toast({ title: "Join request revoked successfully." });
+    
+    setSelectedGroup(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        requests: prev.requests.filter(r => r.id !== reqId),
+      };
+    });
+    setRevokeConfirmOpen(null);
+  };
 
   return (
     <Layout>
@@ -246,14 +268,14 @@ export default function Dashboard() {
                              </AvatarFallback>
                            </Avatar>
                            <div className="flex flex-col">
-                             <span className="font-semibold text-sm flex items-center gap-2">
+                             <span className="font-semibold text-sm flex flex-wrap items-center gap-2">
                                {member.name}
                                {member.isCreator && <Badge variant="secondary" className="text-[10px] h-4 px-1 rounded-sm uppercase tracking-wider">Creator</Badge>}
                              </span>
                              <span className="text-xs text-muted-foreground font-mono">{member.enrollment}</span>
                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="outline" className="text-xs">Div {member.division}</Badge>
                           <ConfirmationBadge confirmed={member.confirmed} />
                         </div>
@@ -268,15 +290,23 @@ export default function Dashboard() {
                     <div className="flex flex-col gap-3">
                       {selectedGroup.requests.map(req => (
                         <div key={req.id} className="p-3 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/10 dark:border-amber-900/30">
-                          <div className="flex justify-between items-start mb-2">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                             <div className="flex flex-col">
                               <span className="font-semibold text-sm">{req.name}</span>
                               <span className="text-xs text-muted-foreground font-mono">{req.enrollment}</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                               <Badge variant="outline" className="text-xs bg-background">Div {req.division}</Badge>
                               <Badge variant="outline" className="text-xs bg-background">{req.specialization}</Badge>
                               <Badge variant="secondary" className="text-xs bg-amber-200/50 text-amber-900 dark:text-amber-200">Pending</Badge>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-6 text-xs px-2 text-destructive border-destructive/30 hover:bg-destructive hover:text-destructive-foreground"
+                                onClick={() => setRevokeConfirmOpen(req.id)}
+                              >
+                                Revoke Request
+                              </Button>
                             </div>
                           </div>
                           {req.note && (
@@ -324,6 +354,22 @@ export default function Dashboard() {
           )}
         </DialogContent>
       </Dialog>
+      <AlertDialog open={!!revokeConfirmOpen} onOpenChange={(open) => !open && setRevokeConfirmOpen(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Withdraw Request?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to revoke this join request? This action will remove your request from the target group.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => revokeConfirmOpen && handleRevoke(revokeConfirmOpen)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Revoke Request
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }

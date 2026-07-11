@@ -1,0 +1,318 @@
+# ==============================================================================
+# SQUADFINDER - IMPLEMENTATION UPDATE
+# REQUEST VALIDATION, REQUEST REVOCATION & MOBILE NAVIGATION IMPROVEMENTS
+# ==============================================================================
+
+IMPORTANT
+
+This is NOT a redesign.
+
+This is NOT a refactor.
+
+This is NOT a rewrite.
+
+The current application is working correctly.
+
+Do NOT modify any existing functionality unless it is directly related to the requirements below.
+
+Maintain the existing architecture, UI, animations, responsiveness, component structure, and design language.
+
+These changes should integrate seamlessly into the current application.
+
+==============================================================================
+1. REQUEST TO JOIN VALIDATION (STRICT BUSINESS RULE)
+==============================================================================
+
+Currently there is a bug.
+
+When a student submits a "Request to Join", the application allows requests even when the student's specialization does not match the specialization of the target group.
+
+This should NEVER happen.
+
+This validation must be enforced before the request is created.
+
+Example
+
+Target Group
+Specialization:
+AI/ML
+
+Student Request
+
+Specialization:
+CS
+
+Result
+
+❌ Request must NOT be submitted.
+
+Instead display a professional validation message.
+
+Example
+
+"You cannot request to join this group because it belongs to the AI/ML specialization while your specialization is CS.
+
+Capstone groups can only contain students from the same specialization."
+
+The request should NOT be stored.
+
+The request should NOT appear in Pending Requests.
+
+The request should NOT update Local Storage.
+
+The request should NOT update statistics.
+
+The modal should remain open so the user can correct the specialization.
+
+------------------------------------------------------------------------------
+
+Valid Examples
+
+AI/ML → AI/ML
+
+✓ Allow
+
+CS → CS
+
+✓ Allow
+
+------------------------------------------------------------------------------
+
+Invalid Examples
+
+CS → AI/ML
+
+❌ Block
+
+AI/ML → CS
+
+❌ Block
+
+This validation should happen BEFORE any request is saved.
+
+==============================================================================
+2. REVOKE REQUEST
+==============================================================================
+
+Currently pending requests can only be viewed.
+
+Users should also be able to revoke (withdraw) their own pending request.
+
+Add a new action.
+
+Button
+
+"Revoke Request"
+
+Place it beside the existing Pending badge inside every Pending Request card.
+
+Example
+
+------------------------------------
+
+Pending
+
+[ Revoke Request ]
+
+------------------------------------
+
+When clicked
+
+Display confirmation dialog.
+
+Title
+
+Withdraw Request?
+
+Message
+
+"Are you sure you want to revoke this join request?
+
+This action will remove your request from the target group."
+
+Buttons
+
+Cancel
+
+Revoke Request
+
+------------------------------------------------------------------------------
+
+After confirmation
+
+Remove the request immediately.
+
+Update Local Storage.
+
+Update the Dashboard.
+
+Update Group Details.
+
+Update Pending Request count.
+
+Update statistics.
+
+Remove the request from every place where it appears.
+
+No page refresh should be required.
+
+Show success toast.
+
+Example
+
+✓ Join request revoked successfully.
+
+==============================================================================
+
+3. DASHBOARD SYNCHRONIZATION
+==============================================================================
+
+Whenever a request is revoked
+
+Immediately update
+
+Pending Requests
+
+Request Count
+
+Dashboard Statistics
+
+Group Card
+
+Group Details
+
+Conflict Center (if applicable)
+
+Everything should remain synchronized.
+
+==============================================================================
+
+4. MOBILE NAVIGATION
+==============================================================================
+
+The current mobile experience is incomplete.
+
+Some navigation items are not visible on smaller screens.
+
+For example
+
+Available Students
+
+cannot be accessed properly on mobile.
+
+Implement a proper mobile navigation system.
+
+Requirements
+
+Responsive Hamburger Menu
+
+Slide-out Sidebar / Drawer
+
+Smooth open and close animation
+
+Accessible keyboard navigation
+
+Touch friendly
+
+Keep the existing desktop navigation unchanged.
+
+------------------------------------------------------------------------------
+
+The mobile sidebar should include every navigation item.
+
+Home
+
+Dashboard
+
+Search
+
+Available Students
+
+Create Group
+
+Conflict Center
+
+About (if present)
+
+Any other existing navigation links
+
+The currently active page should be visually highlighted.
+
+The sidebar should automatically close after navigation.
+
+==============================================================================
+
+5. MOBILE USER EXPERIENCE
+==============================================================================
+
+Review every newly added feature on mobile.
+
+Ensure
+
+Pending Request cards display correctly.
+
+Buttons do not overflow.
+
+Cards stack properly.
+
+Dialogs fit within the viewport.
+
+Long names wrap correctly.
+
+No horizontal scrolling.
+
+No clipped buttons.
+
+Proper spacing throughout.
+
+==============================================================================
+
+6. QUALITY REQUIREMENTS
+==============================================================================
+
+Do NOT redesign the application.
+
+Do NOT modify unrelated business logic.
+
+Do NOT remove existing animations.
+
+Do NOT change existing colors or branding.
+
+Maintain the current premium UI.
+
+Maintain reusable components.
+
+Maintain Local Storage architecture.
+
+Maintain responsiveness.
+
+==============================================================================
+
+FINAL ACCEPTANCE CRITERIA
+==============================================================================
+
+The update is complete only when:
+
+✓ Request validation blocks specialization mismatches.
+
+✓ Invalid requests are never stored.
+
+✓ Invalid requests never affect dashboard statistics.
+
+✓ Pending requests can be revoked.
+
+✓ Revoked requests disappear immediately from every screen.
+
+✓ Local Storage updates correctly.
+
+✓ Dashboard statistics stay synchronized.
+
+✓ Mobile sidebar navigation exists.
+
+✓ Every navigation item is accessible on mobile.
+
+✓ No existing functionality breaks.
+
+✓ The overall UI remains visually identical except for these new enhancements.
+
+# END OF IMPLEMENTATION UPDATE
