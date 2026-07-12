@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useRemoveLookingForGroup } from "@/hooks/use-students";
 import { useToast } from "@/hooks/use-toast";
 import type { Student } from "@/types";
+import { safetyPinSchema } from "@/lib/validation/common.schema";
 
 export default function Available() {
   const { students, isLoading, refresh } = useAvailableStudents();
@@ -27,17 +28,32 @@ export default function Available() {
   const [selectedStudentToRemove, setSelectedStudentToRemove] = useState<Student | null>(null);
   const [removePin, setRemovePin] = useState("");
   const [removeError, setRemoveError] = useState<string | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   const handleRemove = async () => {
     if (!selectedStudentToRemove) return;
+    
+    const pinCheck = safetyPinSchema.safeParse(removePin);
+    if (!pinCheck.success) {
+      setRemoveError(pinCheck.error.errors[0].message);
+      return;
+    }
+    
+    setIsRemoving(true);
     setRemoveError(null);
-    const success = await remove(selectedStudentToRemove.enrollment, removePin);
-    if (success) {
-      toast({ title: "You have been removed from the Available Students list." });
-      refresh();
-      handleCloseRemove();
-    } else {
-      setRemoveError("The Safety PIN you entered is incorrect.");
+    try {
+      const success = await remove(selectedStudentToRemove.enrollment, pinCheck.data);
+      if (success) {
+        toast({ title: "You have been removed from the Available Students list." });
+        refresh();
+        handleCloseRemove();
+      } else {
+        setRemoveError("The Safety PIN you entered is incorrect.");
+      }
+    } catch (e: any) {
+      setRemoveError(e.message || "An error occurred.");
+    } finally {
+      setIsRemoving(false);
     }
   };
 
@@ -157,8 +173,13 @@ export default function Available() {
                 type="password"
                 placeholder="Enter your PIN" 
                 value={removePin}
-                onChange={(e) => setRemovePin(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  setRemovePin(val);
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && handleRemove()}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 autoFocus
               />
             </div>

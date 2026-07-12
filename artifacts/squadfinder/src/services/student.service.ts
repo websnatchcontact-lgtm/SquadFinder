@@ -4,6 +4,7 @@ import { normalizeEnrollment } from '@/utils/validation';
 import { fetchAvailableStudents } from '@/services/supabase.service';
 import { getAllGroups } from '@/services/group.service';
 import { supabase } from '@/lib/supabase';
+import { hashPin } from '@/utils/crypto';
 
 const BASE_STUDENTS = Array.isArray(rawStudents) ? (rawStudents as Student[]) : [];
 
@@ -47,11 +48,11 @@ export async function registerLookingForGroup(input: RegisterLookingForGroupInpu
   const { error } = await supabase.from('available_students').insert({
     enrollment,
     note: null,
-    safety_pin: input.pin,
+    safety_pin: await hashPin(input.pin),
   });
 
   if (error) {
-    console.error("Failed to register looking for group:", error);
+    console.error("Failed to register looking for group:", error.message || error);
     throw new Error("Failed to register.");
   }
 
@@ -63,7 +64,6 @@ export async function registerLookingForGroup(input: RegisterLookingForGroupInpu
     group: null,
     status: 'FREE',
     addedAt: new Date().toISOString(),
-    pin: input.pin,
   };
 }
 
@@ -107,17 +107,17 @@ export function isDuplicateEnrollment(
   return students.some((s) => s.enrollment === normalized);
 }
 
-/** Removes a student from "looking for a group" if the provided PIN matches the stored PIN. */
 export async function removeLookingForGroup(enrollment: string, pin: string): Promise<boolean> {
   const normalized = normalizeEnrollment(enrollment);
-  const availableStudents = await fetchAvailableStudents();
+  const hashedPin = await hashPin(pin);
   
-  const student = availableStudents.find((s) => s.enrollment === normalized);
-  if (!student) return false;
-  if (student.pin !== pin) return false;
-  
-  const { error } = await supabase.from('available_students').delete().eq('enrollment', normalized);
-  return !error;
+  const { data, error } = await supabase.from('available_students')
+    .delete()
+    .eq('enrollment', normalized)
+    .or(`safety_pin.eq.${pin},safety_pin.eq.${hashedPin}`)
+    .select('id');
+    
+  return !error && !!data && data.length > 0;
 }
 
 export type { DivisionCode, SpecializationCode };

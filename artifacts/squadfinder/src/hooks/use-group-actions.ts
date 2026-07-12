@@ -52,8 +52,8 @@ export function useGroupActions() {
     return updateGroupNotes(groupNumber, notes);
   }, []);
 
-  const revoke = useCallback(async (groupNumber: number, requestId: string) => {
-    return revokeRequest(groupNumber, requestId);
+  const revoke = useCallback(async (groupNumber: number, requestId: string, pin: string) => {
+    return revokeRequest(groupNumber, requestId, pin);
   }, []);
 
   return {

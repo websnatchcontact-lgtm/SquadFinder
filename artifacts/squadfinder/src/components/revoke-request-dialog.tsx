@@ -8,6 +8,7 @@ import { useGroups } from "@/hooks/use-groups";
 import { useStatistics } from "@/hooks/use-statistics";
 import { useToast } from "@/hooks/use-toast";
 import type { JoinRequest } from "@/types";
+import { safetyPinSchema } from "@/lib/validation/common.schema";
 
 interface RevokeRequestDialogProps {
   request: JoinRequest | null;
@@ -28,14 +29,15 @@ export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeReque
   const handleRevoke = async () => {
     if (!request) return;
     
-    if (pin !== request.pin) {
-      setError("The Safety PIN you entered is incorrect.");
+    const pinCheck = safetyPinSchema.safeParse(pin);
+    if (!pinCheck.success) {
+      setError(pinCheck.error.errors[0].message);
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await revoke(request.groupNumber, request.id);
+      await revoke(request.groupNumber, request.id, pinCheck.data);
       refreshGroups();
       refreshStats();
       toast({
@@ -43,8 +45,8 @@ export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeReque
         description: "Your join request has been successfully removed.",
       });
       handleClose();
-    } catch (e) {
-      setError("An error occurred while revoking the request.");
+    } catch (e: any) {
+      setError(e.message || "An error occurred while revoking the request.");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +82,12 @@ export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeReque
             type="password"
             placeholder="Enter your Safety PIN"
             value={pin}
-            onChange={(e) => setPin(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, "");
+              setPin(val);
+            }}
+            inputMode="numeric"
+            pattern="[0-9]*"
             autoFocus
           />
           <div className="flex gap-2 justify-end">

@@ -11,13 +11,13 @@ export async function fetchAllGroups(): Promise<Group[]> {
       students ( full_name, division, specialization )
     ),
     join_requests (
-      id, enrollment, status, note, safety_pin, created_at,
+      id, enrollment, status, note, created_at,
       students ( full_name, division, specialization )
     )
   `);
 
   if (error || !data) {
-    console.error('Error fetching groups from Supabase:', error);
+    console.error('Error fetching groups from Supabase:', error?.message || error);
     return [];
   }
 
@@ -48,7 +48,6 @@ export async function fetchAllGroups(): Promise<Group[]> {
         note: r.note,
         requestedAt: r.created_at,
         status: r.status,
-        pin: r.safety_pin,
       }));
 
     const confirmedMembers = members.filter((m) => m.confirmed).length;
@@ -89,12 +88,12 @@ export async function fetchAllGroups(): Promise<Group[]> {
 
 export async function fetchAvailableStudents(): Promise<Student[]> {
   const { data, error } = await supabase.from('available_students').select(`
-    id, enrollment, note, safety_pin, created_at,
+    id, enrollment, note, created_at,
     students ( full_name, division, specialization )
   `);
 
   if (error || !data) {
-    console.error('Error fetching available students:', error);
+    console.error('Error fetching available students:', error?.message || error);
     return [];
   }
 
@@ -106,6 +105,5 @@ export async function fetchAvailableStudents(): Promise<Student[]> {
     group: null,
     status: 'FREE',
     addedAt: row.created_at,
-    pin: row.safety_pin,
   }));
 }

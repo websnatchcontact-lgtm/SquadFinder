@@ -9,7 +9,10 @@ import { MAX_GROUP_MEMBERS, MIN_GROUP_MEMBERS, SPECIALIZATIONS } from '@/constan
 
 import { supabase } from '@/lib/supabase';
 import { fetchAllGroups, fetchAvailableStudents } from '@/services/supabase.service';
-import { normalizeEnrollment, validateEnrollment, validateName } from '@/utils/validation';
+import { normalizeEnrollment } from '@/utils/validation';
+import { createGroupSchema } from '@/lib/validation/createGroup.schema';
+import { requestToJoinSchema } from '@/lib/validation/requestToJoin.schema';
+import { hashPin } from '@/utils/crypto';
 
 export async function getAllGroups(): Promise<Group[]> {
   return fetchAllGroups();
@@ -22,21 +25,13 @@ export async function getGroup(groupNumber: number): Promise<Group | undefined> 
 
 /** Validates a full Create Group submission against every business rule. */
 export async function validateCreateGroupInput(input: CreateGroupInput): Promise<ValidationResult> {
-  const nameCheck = validateName(input.creatorName);
-  if (!nameCheck.valid) return nameCheck;
+  const parsed = createGroupSchema.safeParse(input);
+  if (!parsed.success) {
+    return { valid: false, message: parsed.error.errors[0].message };
+  }
 
-  if (input.members.length < MIN_GROUP_MEMBERS) {
-    return {
-      valid: false,
-      message: `A group needs at least ${MIN_GROUP_MEMBERS} members.`,
-    };
-  }
-  if (input.members.length > MAX_GROUP_MEMBERS) {
-    return {
-      valid: false,
-      message: `A group can have at most ${MAX_GROUP_MEMBERS} members.`,
-    };
-  }
+  // Use sanitized input for further business checks
+  const validatedInput = parsed.data;
 
   const seenEnrollments = new Set<string>();
   const availableStudents = await fetchAvailableStudents();
@@ -46,13 +41,8 @@ export async function validateCreateGroupInput(input: CreateGroupInput): Promise
     allGroups.flatMap((g) => g.members.map((m) => m.enrollment)),
   );
   
-  for (let index = 0; index < input.members.length; index++) {
-    const member = input.members[index];
-    const memberNameCheck = validateName(member.name);
-    if (!memberNameCheck.valid) return memberNameCheck;
-
-    const enrollmentCheck = validateEnrollment(member.enrollment);
-    if (!enrollmentCheck.valid) return enrollmentCheck;
+  for (let index = 0; index < validatedInput.members.length; index++) {
+    const member = validatedInput.members[index];
 
     const normalized = normalizeEnrollment(member.enrollment);
     
@@ -77,7 +67,7 @@ export async function validateCreateGroupInput(input: CreateGroupInput): Promise
     seenEnrollments.add(normalized);
   }
 
-  const specializations = new Set(input.members.map((m) => m.specialization));
+  const specializations = new Set(validatedInput.members.map((m) => m.specialization));
   if (specializations.size > 1) {
     return {
       valid: false,
@@ -112,7 +102,7 @@ export async function createGroup(input: CreateGroupInput): Promise<Group> {
     .single();
 
   if (groupError || !groupData) {
-    console.error('Failed to create group:', groupError);
+    console.error('Failed to create group:', groupError?.message || groupError);
     throw new Error('Failed to create group.');
   }
 
@@ -134,7 +124,7 @@ export async function createGroup(input: CreateGroupInput): Promise<Group> {
     }, { onConflict: 'enrollment' });
 
     if (upsertError) {
-      console.error('Failed to upsert student:', upsertError);
+      console.error('Failed to upsert student:', upsertError.message || upsertError);
       throw new Error(`Failed to save student ${normalizedEnrollment}: ${upsertError.message}`);
     }
   }
@@ -151,7 +141,7 @@ export async function createGroup(input: CreateGroupInput): Promise<Group> {
     .insert(membersToInsert);
 
   if (membersError) {
-    console.error('Failed to add members:', membersError);
+    console.error('Failed to add members:', membersError.message || membersError);
     throw new Error(`Failed to add group members: ${membersError.message}`);
   }
 
@@ -164,26 +154,27 @@ export function validateRequestToJoin(
   group: Group,
   input: RequestToJoinInput,
 ): ValidationResult {
+  const parsed = requestToJoinSchema.safeParse(input);
+  if (!parsed.success) {
+    return { valid: false, message: parsed.error.errors[0].message };
+  }
+  
+  const validatedInput = parsed.data;
+
   if (group.isFull) {
     return { valid: false, message: 'This group is already full.' };
   }
 
-  const nameCheck = validateName(input.name);
-  if (!nameCheck.valid) return nameCheck;
-
-  const enrollmentCheck = validateEnrollment(input.enrollment);
-  if (!enrollmentCheck.valid) return enrollmentCheck;
-
-  if (input.specialization !== group.specialization) {
+  if (validatedInput.specialization !== group.specialization) {
     const groupLabel = SPECIALIZATIONS[group.specialization].label;
-    const studentLabel = SPECIALIZATIONS[input.specialization].label;
+    const studentLabel = SPECIALIZATIONS[validatedInput.specialization].label;
     return {
       valid: false,
       message: `You cannot request to join this group because it belongs to the ${groupLabel} specialization while your specialization is ${studentLabel}. Capstone groups can only contain students from the same specialization.`,
     };
   }
 
-  const normalized = normalizeEnrollment(input.enrollment);
+  const normalized = normalizeEnrollment(validatedInput.enrollment);
   if (group.members.some((m) => m.enrollment === normalized)) {
     return { valid: false, message: 'This student has already been added to this group.' };
   }
@@ -222,7 +213,7 @@ export async function requestToJoin(groupNumber: number, input: RequestToJoinInp
   }, { onConflict: 'enrollment' });
 
   if (upsertError) {
-    console.error('Failed to upsert student:', upsertError);
+    console.error('Failed to upsert student:', upsertError.message || upsertError);
     throw new Error(`Failed to save student ${normalizedEnrollment}: ${upsertError.message}`);
   }
 
@@ -231,11 +222,11 @@ export async function requestToJoin(groupNumber: number, input: RequestToJoinInp
     enrollment: normalizedEnrollment,
     status: 'PENDING',
     note: input.note?.trim() || null,
-    safety_pin: input.pin,
-  }).select().single();
+    safety_pin: await hashPin(input.pin),
+  }).select('id, created_at').single();
 
   if (error) {
-    console.error("Failed to submit request", error);
+    console.error("Failed to submit request", error.message || error);
     return null;
   }
 
@@ -249,7 +240,6 @@ export async function requestToJoin(groupNumber: number, input: RequestToJoinInp
     note: input.note?.trim() || undefined,
     requestedAt: requestData.created_at,
     status: 'PENDING',
-    pin: input.pin,
   };
 }
 
@@ -271,8 +261,15 @@ export async function updateGroupNotes(groupNumber: number, notes: string): Prom
     .eq('group_number', groupNumber);
 }
 
-export async function revokeRequest(groupNumber: number, requestId: string): Promise<void> {
-  await supabase.from('join_requests')
+export async function revokeRequest(groupNumber: number, requestId: string, pin: string): Promise<void> {
+  const hashedPin = await hashPin(pin);
+  const { data, error } = await supabase.from('join_requests')
     .delete()
-    .eq('id', requestId);
+    .eq('id', requestId)
+    .or(`safety_pin.eq.${pin},safety_pin.eq.${hashedPin}`)
+    .select('id');
+
+  if (error || !data || data.length === 0) {
+    throw new Error('Invalid Safety PIN or request not found.');
+  }
 }

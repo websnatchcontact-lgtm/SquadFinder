@@ -27,8 +27,6 @@ export interface Student {
   status: StudentStatus;
   /** Present only for students added via "I'm Looking For A Group" (Local Storage). */
   addedAt?: string;
-  /** Safety PIN for removing the student from the available list. (Local Storage only). */
-  pin?: string;
 }
 
 /** A pending request to join a group. Never auto-accepted -- informational only. */
@@ -42,7 +40,6 @@ export interface JoinRequest {
   note?: string;
   requestedAt: string;
   status: 'PENDING';
-  pin: string;
 }
 
 /** A single member of a group, with confirmation state. */

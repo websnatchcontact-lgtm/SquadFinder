@@ -124,7 +124,10 @@ export function CreateGroupDialog({ open, onOpenChange }: { open: boolean, onOpe
                   id="creatorName" 
                   placeholder="Enter your full name" 
                   value={creatorName} 
-                  onChange={e => setCreatorName(e.target.value)}
+                  onChange={e => {
+                    const val = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+                    setCreatorName(val);
+                  }}
                   onKeyDown={e => e.key === 'Enter' && handleNext()}
                   autoFocus
                 />
@@ -159,11 +162,27 @@ export function CreateGroupDialog({ open, onOpenChange }: { open: boolean, onOpe
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label className="text-xs">Full Name</Label>
-                        <Input value={member.name} onChange={e => updateMember(index, 'name', e.target.value)} placeholder="Name" />
+                        <Input 
+                          value={member.name} 
+                          onChange={e => {
+                            const val = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+                            updateMember(index, 'name', val);
+                          }} 
+                          placeholder="Name" 
+                        />
                       </div>
                       <div className="space-y-1.5">
                         <Label className="text-xs">Enrollment</Label>
-                        <Input value={member.enrollment} onChange={e => updateMember(index, 'enrollment', e.target.value)} placeholder="Enrollment #" />
+                        <Input 
+                          value={member.enrollment} 
+                          onChange={e => {
+                            const val = e.target.value.replace(/\D/g, "");
+                            updateMember(index, 'enrollment', val);
+                          }} 
+                          placeholder="Enrollment #" 
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                        />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

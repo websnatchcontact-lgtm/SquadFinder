@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { groupNotesSchema } from "@/lib/validation/common.schema";
 import { useStatistics } from "@/hooks/use-statistics";
 import { useGroups } from "@/hooks/use-groups";
 import { SkeletonStats } from "@/components/loading-skeleton";
@@ -329,8 +330,17 @@ export default function Dashboard() {
                     {selectedGroup.source === 'local' && (
                       <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={async () => {
                         if (editingNotes) {
-                          await saveNotes(selectedGroup.groupNumber, noteValue);
-                          setSelectedGroup(prev => prev ? {...prev, notes: noteValue} : prev);
+                          const notesCheck = groupNotesSchema.safeParse(noteValue);
+                          if (!notesCheck.success) {
+                            toast({
+                              title: "Invalid Notes",
+                              description: notesCheck.error.errors[0].message,
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                          await saveNotes(selectedGroup.groupNumber, notesCheck.data);
+                          setSelectedGroup(prev => prev ? {...prev, notes: notesCheck.data} : prev);
                         }
                         setEditingNotes(!editingNotes);
                       }}>

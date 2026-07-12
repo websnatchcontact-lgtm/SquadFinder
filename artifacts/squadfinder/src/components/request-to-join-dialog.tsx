@@ -35,17 +35,13 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
   const { students, refresh: refreshStudents } = useStudents();
   const { toast } = useToast();
 
-  const registeredStudent = students.find(s => s.enrollment === enrollment && s.pin);
-  const isRegistered = !!registeredStudent;
-
   const validateAndSubmit = async () => {
-    const finalPin = isRegistered ? registeredStudent.pin! : pin;
-    if (!finalPin || finalPin.length < 4) {
+    if (!pin || pin.length < 4) {
       setError("Please enter a valid Safety PIN (at least 4 characters).");
       return;
     }
     
-    const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin: finalPin };
+    const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin };
     const validation = await validateJoin(group, input);
     if (!validation.valid) {
       setError(validation.message || "Invalid input");
@@ -62,8 +58,7 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
 
   const doSubmit = async () => {
     setIsSubmitting(true);
-    const finalPin = isRegistered ? registeredStudent.pin! : pin;
-    const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin: finalPin };
+    const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin };
     try {
       await submitRequestToJoin(group.groupNumber, input);
       refreshGroups();
@@ -113,11 +108,28 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
           <div className="space-y-4 py-2 overflow-y-auto min-h-0 pr-1">
             <div className="space-y-2">
               <Label>Full Name</Label>
-              <Input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" autoFocus />
+              <Input 
+                value={name} 
+                onChange={e => {
+                  const val = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+                  setName(val);
+                }} 
+                placeholder="Your name" 
+                autoFocus 
+              />
             </div>
             <div className="space-y-2">
               <Label>Enrollment Number</Label>
-              <Input value={enrollment} onChange={e => setEnrollment(e.target.value)} placeholder="e.g. 21012345" />
+              <Input 
+                value={enrollment} 
+                onChange={e => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  setEnrollment(val);
+                }} 
+                placeholder="e.g. 21012345" 
+                inputMode="numeric"
+                pattern="[0-9]*"
+              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -148,20 +160,23 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
                 className="resize-none h-20"
               />
             </div>
-            {!isRegistered && (
               <div className="space-y-2">
                 <Label>Safety PIN</Label>
                 <Input 
                   value={pin} 
-                  onChange={e => setPin(e.target.value)} 
+                  onChange={e => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    setPin(val);
+                  }} 
                   placeholder="Create or enter your PIN" 
                   type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                 />
                 <p className="text-[10px] text-muted-foreground leading-tight">
                   This PIN is required to revoke your request later.
                 </p>
               </div>
-            )}
             <Button onClick={validateAndSubmit} className="w-full mt-2" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Submit Request

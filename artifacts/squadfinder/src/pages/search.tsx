@@ -23,13 +23,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ConfirmationBadge } from "@/components/badges";
 
-const formSchema = z.object({
-  enrollment: z.string().min(8, "Enrollment number is too short").max(20, "Enrollment number is too long"),
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  specialization: z.enum(["CS", "AIML"]),
-  division: z.enum(["A", "B"]),
-  pin: z.string().min(4, "PIN must be at least 4 characters").max(8, "PIN must be at most 8 characters").regex(/^[a-zA-Z0-9]+$/, "PIN can only contain letters and numbers"),
-});
+import { availableStudentSchema } from "@/lib/validation/availableStudent.schema";
+import { searchSchema } from "@/lib/validation/search.schema";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -48,8 +43,8 @@ export default function SearchPage() {
   const { students, refresh: refreshStudents } = useStudents();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof availableStudentSchema>>({
+    resolver: zodResolver(availableStudentSchema),
     defaultValues: {
       enrollment: "",
       name: "",
@@ -59,7 +54,7 @@ export default function SearchPage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof availableStudentSchema>) {
     try {
       setRegisterError(null);
       await register(values);
@@ -108,7 +103,17 @@ export default function SearchPage() {
               icon={isSearching ? <Loader2 className="h-6 w-6 animate-spin text-primary" /> : <Search className="h-6 w-6 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />}
               value={query}
               onChange={(e) => {
-                setQuery(e.target.value);
+                const parsed = searchSchema.safeParse(e.target.value);
+                if (parsed.success) {
+                  setQuery(parsed.data);
+                } else {
+                  // Only update the raw value if it's safe but maybe partial, or just don't allow invalid typing
+                  // Actually, to prevent annoying UX, we just validate it. If it fails, we keep previous state or just let it type but not search?
+                  // Best is to allow typing but apply the parsed value if success, or raw if not completely unsafe, but the prompt says prevent invalid typing whenever possible.
+                  if (e.target.value === "" || /^[a-zA-Z0-9\s\-'.]+$/.test(e.target.value)) {
+                    setQuery(e.target.value);
+                  }
+                }
                 setSelectedStudent(null);
               }}
               autoFocus
@@ -279,7 +284,16 @@ export default function SearchPage() {
                   <FormItem>
                     <FormLabel>Enrollment Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. 21012345" {...field} />
+                      <Input 
+                        placeholder="e.g. 21012345" 
+                        {...field} 
+                        onChange={e => {
+                          const val = e.target.value.replace(/\D/g, "");
+                          field.onChange(val);
+                        }}
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -292,7 +306,14 @@ export default function SearchPage() {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" {...field} />
+                      <Input 
+                        placeholder="John Doe" 
+                        {...field} 
+                        onChange={e => {
+                          const val = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+                          field.onChange(val);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -347,7 +368,17 @@ export default function SearchPage() {
                   <FormItem>
                     <FormLabel>Safety PIN</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. 1234 or ABCD" {...field} />
+                      <Input 
+                        placeholder="e.g. 1234" 
+                        {...field} 
+                        onChange={e => {
+                          const val = e.target.value.replace(/\D/g, "");
+                          field.onChange(val);
+                        }}
+                        type="password"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                      />
                     </FormControl>
                     <p className="text-xs text-muted-foreground mt-2 font-medium bg-muted/50 p-2 rounded border leading-relaxed">
                     Create a Safety PIN. You'll need this PIN if you want to remove yourself from the Available Students list or revoke any join requests you've submitted in the future. Since this application does not require login, this PIN helps verify that only you can manage your requests.
