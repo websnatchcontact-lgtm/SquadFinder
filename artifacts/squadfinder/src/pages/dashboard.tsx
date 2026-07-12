@@ -14,6 +14,7 @@ import { StudentCard } from "@/components/student-card";
 import { Group, GroupFilters, GroupSortKey, JoinRequest } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Accordion } from "@/components/ui/accordion";
 import { Link } from "wouter";
 import { ROUTES } from "@/constants";
 import { GroupFilterBar } from "@/components/group-filter-bar";
@@ -51,7 +52,7 @@ export default function Dashboard() {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(g => 
-        g.groupNumber.toLowerCase().includes(q) || 
+        `Group ${g.groupNumber}`.toLowerCase().includes(q) || 
         g.members.some(m => 
           m.name.toLowerCase().includes(q) || 
           m.enrollment.toLowerCase().includes(q)
@@ -130,9 +131,11 @@ export default function Dashboard() {
             {conflicts.length > 0 ? (
               <>
                 <p className="text-muted-foreground">These students appear in multiple groups and must resolve their status.</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {conflicts.map(c => <ConflictCard key={c.enrollment} conflict={c} />)}
-                </div>
+                <Accordion type="single" collapsible className="w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
+                    {conflicts.map(c => <ConflictCard key={c.enrollment} conflict={c} />)}
+                  </div>
+                </Accordion>
               </>
             ) : (
               <div className="py-8 text-center border border-border/60 border-dashed rounded-2xl bg-card shadow-sm">
@@ -217,7 +220,7 @@ export default function Dashboard() {
               <div className="p-6 pb-4 border-b bg-muted/10">
                 <DialogHeader>
                   <div className="flex items-center justify-between mb-2">
-                    <DialogTitle className="text-2xl">{selectedGroup.groupNumber}</DialogTitle>
+                    <DialogTitle className="text-2xl">Group {selectedGroup.groupNumber}</DialogTitle>
                     <div className="flex gap-2">
                       <HealthBadge health={selectedGroup.health} />
                       {!selectedGroup.isFull && (
@@ -324,9 +327,9 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Group Notes</h4>
                     {selectedGroup.source === 'local' && (
-                      <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => {
+                      <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={async () => {
                         if (editingNotes) {
-                          saveNotes(selectedGroup.groupNumber, noteValue);
+                          await saveNotes(selectedGroup.groupNumber, noteValue);
                           setSelectedGroup(prev => prev ? {...prev, notes: noteValue} : prev);
                         }
                         setEditingNotes(!editingNotes);

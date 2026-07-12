@@ -1,100 +1,27 @@
 import type {
   CreateGroupInput,
   Group,
-  GroupMember,
   JoinRequest,
   RequestToJoinInput,
-  Student,
   ValidationResult,
 } from '@/types';
 import { MAX_GROUP_MEMBERS, MIN_GROUP_MEMBERS, SPECIALIZATIONS } from '@/constants';
 
-import {
-  getConfirmations,
-  getCreatedGroups,
-  getNotes,
-  getRequests,
-  setConfirmations,
-  setCreatedGroups,
-  setNotes,
-  setRequests,
-  getLookingForGroup,
-  type StoredCreatedGroup,
-} from '@/services/storage.service';
-import { calculateGroupHealth, calculateGroupSeats, generateGroupNumber } from '@/utils/groups';
-import { countGroupConflicts, detectConflicts } from '@/utils/conflicts';
+import { supabase } from '@/lib/supabase';
+import { fetchAllGroups, fetchAvailableStudents } from '@/services/supabase.service';
 import { normalizeEnrollment, validateEnrollment, validateName } from '@/utils/validation';
 
-
-
-function toDerivedGroup(
-  stored: StoredCreatedGroup,
-  source: 'demo' | 'local',
-  confirmations: Record<string, Record<string, boolean>>,
-  requestsMap: Record<string, JoinRequest[]>,
-  notesMap: Record<string, string>,
-): Group {
-  const overrides = confirmations[stored.groupNumber] ?? {};
-  const members: GroupMember[] = stored.members.map((m) => ({
-    ...m,
-    confirmed: overrides[m.enrollment] ?? m.confirmed,
-  }));
-
-  const confirmedMembers = members.filter((m) => m.confirmed).length;
-  const requests = requestsMap[stored.groupNumber] ?? [];
-  const notes = notesMap[stored.groupNumber] ?? '';
-
-  const divisionCounts: Group['divisionCounts'] = {};
-  for (const member of members) {
-    divisionCounts[member.division] = (divisionCounts[member.division] ?? 0) + 1;
-  }
-
-  return {
-    groupNumber: stored.groupNumber,
-    source,
-    specialization: stored.specialization,
-    createdBy: stored.createdBy,
-    createdAt: stored.createdAt,
-    members,
-    notes,
-    requests,
-    totalMembers: members.length,
-    confirmedMembers,
-    seatsLeft: calculateGroupSeats(members.length),
-    isFull: calculateGroupSeats(members.length) === 0,
-    conflictCount: 0, // filled in by getAllGroups() once every group is known
-    health: calculateGroupHealth(confirmedMembers, members.length, 0),
-    divisionCounts,
-  };
+export async function getAllGroups(): Promise<Group[]> {
+  return fetchAllGroups();
 }
 
-export function getAllGroups(): Group[] {
-  const localStored = getCreatedGroups();
-
-  const confirmations = getConfirmations();
-  const requestsMap = getRequests();
-  const notesMap = getNotes();
-
-  const groups = localStored.map((g) => toDerivedGroup(g, 'local', confirmations, requestsMap, notesMap));
-
-  const conflicts = detectConflicts(groups);
-  for (const group of groups) {
-    const conflictCount = countGroupConflicts(group, conflicts);
-    group.conflictCount = conflictCount;
-    group.health = calculateGroupHealth(group.confirmedMembers, group.totalMembers, conflictCount);
-  }
-
-  return groups.sort((a, b) =>
-    a.groupNumber.localeCompare(b.groupNumber, undefined, { numeric: true }),
-  );
-}
-
-export function getGroup(groupNumber: string): Group | undefined {
-  return getAllGroups().find((g) => g.groupNumber === groupNumber);
+export async function getGroup(groupNumber: number): Promise<Group | undefined> {
+  const allGroups = await fetchAllGroups();
+  return allGroups.find((g) => g.groupNumber === groupNumber);
 }
 
 /** Validates a full Create Group submission against every business rule. */
-export function validateCreateGroupInput(input: CreateGroupInput): ValidationResult {
+export async function validateCreateGroupInput(input: CreateGroupInput): Promise<ValidationResult> {
   const nameCheck = validateName(input.creatorName);
   if (!nameCheck.valid) return nameCheck;
 
@@ -112,9 +39,15 @@ export function validateCreateGroupInput(input: CreateGroupInput): ValidationRes
   }
 
   const seenEnrollments = new Set<string>();
-  const availableStudents = getLookingForGroup();
+  const availableStudents = await fetchAvailableStudents();
   
-  for (const member of input.members) {
+  const allGroups = await fetchAllGroups();
+  const existingEnrollments = new Set(
+    allGroups.flatMap((g) => g.members.map((m) => m.enrollment)),
+  );
+  
+  for (let index = 0; index < input.members.length; index++) {
+    const member = input.members[index];
     const memberNameCheck = validateName(member.name);
     if (!memberNameCheck.valid) return memberNameCheck;
 
@@ -122,6 +55,14 @@ export function validateCreateGroupInput(input: CreateGroupInput): ValidationRes
     if (!enrollmentCheck.valid) return enrollmentCheck;
 
     const normalized = normalizeEnrollment(member.enrollment);
+    
+    if (existingEnrollments.has(normalized)) {
+      if (index === 0) {
+        return { valid: false, message: 'You already belong to an existing group. A student cannot create or belong to multiple groups.' };
+      }
+      // Non-creator duplicates are soft-blocked via UI warnings
+    }
+    
     if (seenEnrollments.has(normalized)) {
       return { valid: false, message: 'This student has already been added to this group.' };
     }
@@ -149,8 +90,8 @@ export function validateCreateGroupInput(input: CreateGroupInput): ValidationRes
 }
 
 /** Enrollment numbers in `members` that already belong to another registered group. */
-export function findCrossGroupDuplicates(members: { enrollment: string }[]): string[] {
-  const existingGroups = getAllGroups();
+export async function findCrossGroupDuplicates(members: { enrollment: string }[]): Promise<string[]> {
+  const existingGroups = await getAllGroups();
   const existingEnrollments = new Set(
     existingGroups.flatMap((g) => g.members.map((m) => m.enrollment)),
   );
@@ -159,31 +100,64 @@ export function findCrossGroupDuplicates(members: { enrollment: string }[]): str
     .filter((enrollment) => existingEnrollments.has(enrollment));
 }
 
-/** Creates a new group and persists it to Local Storage. Never touches students.json. */
-export function createGroup(input: CreateGroupInput): Group {
-  const existing = getCreatedGroups();
-  const groupNumber = generateGroupNumber([...existing.map((g) => g.groupNumber)]);
-  const createdAt = new Date().toISOString();
-  const specialization = input.members[0]!.specialization;
+/** Creates a new group and persists it to Supabase. */
+export async function createGroup(input: CreateGroupInput): Promise<Group> {
+  const creatorName = input.creatorName.trim();
+  
+  // 1. Insert Group
+  const { data: groupData, error: groupError } = await supabase
+    .from('groups')
+    .insert({ creator_name: creatorName })
+    .select('id, group_number')
+    .single();
 
-  const stored: StoredCreatedGroup = {
-    groupNumber,
-    specialization,
-    createdBy: input.creatorName.trim(),
-    createdAt,
-    members: input.members.map((m, index) => ({
-      enrollment: normalizeEnrollment(m.enrollment),
-      name: m.name.trim(),
-      division: m.division,
-      specialization: m.specialization,
-      isCreator: index === 0,
-      confirmed: index === 0,
-    })),
-  };
+  if (groupError || !groupData) {
+    console.error('Failed to create group:', groupError);
+    throw new Error('Failed to create group.');
+  }
 
-  setCreatedGroups([...existing, stored]);
+  const groupId = groupData.id;
+  const groupNumber = groupData.group_number;
 
-  return getGroup(groupNumber)!;
+  // 2. Upsert Students
+  for (const member of input.members) {
+    const normalizedEnrollment = normalizeEnrollment(member.enrollment);
+    
+    // Attempt upsert (only updates name, division, specialization)
+    // Note: The prompt asks me to implement standard Supabase, so I'll just use standard upsert
+    // This depends on Supabase constraints, assuming enrollment is UNIQUE.
+    const { error: upsertError } = await supabase.from('students').upsert({
+      enrollment: normalizedEnrollment,
+      full_name: member.name.trim(),
+      division: member.division,
+      specialization: member.specialization,
+    }, { onConflict: 'enrollment' });
+
+    if (upsertError) {
+      console.error('Failed to upsert student:', upsertError);
+      throw new Error(`Failed to save student ${normalizedEnrollment}: ${upsertError.message}`);
+    }
+  }
+
+  // 3. Insert Group Members
+  const membersToInsert = input.members.map((m, index) => ({
+    group_id: groupId,
+    enrollment: normalizeEnrollment(m.enrollment),
+    confirmed: index === 0, // creator is automatically confirmed
+  }));
+
+  const { error: membersError } = await supabase
+    .from('group_members')
+    .insert(membersToInsert);
+
+  if (membersError) {
+    console.error('Failed to add members:', membersError);
+    throw new Error(`Failed to add group members: ${membersError.message}`);
+  }
+
+  const newGroup = await getGroup(groupNumber);
+  if (!newGroup) throw new Error("Could not retrieve newly created group.");
+  return newGroup;
 }
 
 export function validateRequestToJoin(
@@ -217,45 +191,88 @@ export function validateRequestToJoin(
   return { valid: true };
 }
 
-export function requestToJoin(groupNumber: string, input: RequestToJoinInput): JoinRequest {
-  const requestsMap = getRequests();
-  const request: JoinRequest = {
-    id: `${groupNumber}-${normalizeEnrollment(input.enrollment)}-${Date.now()}`,
+export async function validateRequestToJoinStrict(
+  group: Group,
+  input: RequestToJoinInput,
+): Promise<ValidationResult> {
+  const syncResult = validateRequestToJoin(group, input);
+  if (!syncResult.valid) return syncResult;
+
+  const duplicates = await findCrossGroupDuplicates([{ enrollment: input.enrollment }]);
+  if (duplicates.length > 0) {
+    return { valid: false, message: 'You already belong to an existing group. A student cannot create or belong to multiple groups.' };
+  }
+  
+  return { valid: true };
+}
+
+export async function requestToJoin(groupNumber: number, input: RequestToJoinInput): Promise<JoinRequest | null> {
+  // First, find the group id
+  const { data: groupData } = await supabase.from('groups').select('id').eq('group_number', groupNumber).single();
+  if (!groupData) throw new Error("Group not found");
+  
+  const normalizedEnrollment = normalizeEnrollment(input.enrollment);
+  
+  // Upsert student just in case
+  const { error: upsertError } = await supabase.from('students').upsert({
+    enrollment: normalizedEnrollment,
+    full_name: input.name.trim(),
+    division: input.division,
+    specialization: input.specialization,
+  }, { onConflict: 'enrollment' });
+
+  if (upsertError) {
+    console.error('Failed to upsert student:', upsertError);
+    throw new Error(`Failed to save student ${normalizedEnrollment}: ${upsertError.message}`);
+  }
+
+  const { data: requestData, error } = await supabase.from('join_requests').insert({
+    group_id: groupData.id,
+    enrollment: normalizedEnrollment,
+    status: 'PENDING',
+    note: input.note?.trim() || null,
+    safety_pin: input.pin,
+  }).select().single();
+
+  if (error) {
+    console.error("Failed to submit request", error);
+    return null;
+  }
+
+  return {
+    id: requestData.id.toString(),
     groupNumber,
     name: input.name.trim(),
-    enrollment: normalizeEnrollment(input.enrollment),
+    enrollment: normalizedEnrollment,
     division: input.division,
     specialization: input.specialization,
     note: input.note?.trim() || undefined,
-    requestedAt: new Date().toISOString(),
+    requestedAt: requestData.created_at,
     status: 'PENDING',
     pin: input.pin,
   };
-
-  requestsMap[groupNumber] = [...(requestsMap[groupNumber] ?? []), request];
-  setRequests(requestsMap);
-
-  return request;
 }
 
-/** Marks a student as confirmed within a group. Persists instantly, no page refresh needed. */
-export function confirmMembership(groupNumber: string, enrollment: string): void {
-  const confirmations = getConfirmations();
-  const normalized = normalizeEnrollment(enrollment);
-  confirmations[groupNumber] = { ...(confirmations[groupNumber] ?? {}), [normalized]: true };
-  setConfirmations(confirmations);
+export async function confirmMembership(groupNumber: number, enrollment: string): Promise<void> {
+  const { data: groupData } = await supabase.from('groups').select('id').eq('group_number', groupNumber).single();
+  if (!groupData) return;
+
+  const normalizedEnrollment = normalizeEnrollment(enrollment);
+  
+  await supabase.from('group_members')
+    .update({ confirmed: true })
+    .eq('group_id', groupData.id)
+    .eq('enrollment', normalizedEnrollment);
 }
 
-export function updateGroupNotes(groupNumber: string, notes: string): void {
-  const notesMap = getNotes();
-  notesMap[groupNumber] = notes;
-  setNotes(notesMap);
+export async function updateGroupNotes(groupNumber: number, notes: string): Promise<void> {
+  await supabase.from('groups')
+    .update({ notes })
+    .eq('group_number', groupNumber);
 }
 
-/** Withdraws a pending join request. Removes it from Local Storage entirely -- never soft-deleted. */
-export function revokeRequest(groupNumber: string, requestId: string): void {
-  const requestsMap = getRequests();
-  const existing = requestsMap[groupNumber] ?? [];
-  requestsMap[groupNumber] = existing.filter((r) => r.id !== requestId);
-  setRequests(requestsMap);
+export async function revokeRequest(groupNumber: number, requestId: string): Promise<void> {
+  await supabase.from('join_requests')
+    .delete()
+    .eq('id', requestId);
 }

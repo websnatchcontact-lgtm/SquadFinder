@@ -1,41 +1,61 @@
 import rawStudents from '@/data/students.json';
 import type { DivisionCode, RegisterLookingForGroupInput, SpecializationCode, Student } from '@/types';
 import { normalizeEnrollment } from '@/utils/validation';
-import { getLookingForGroup, setLookingForGroup } from '@/services/storage.service';
+import { fetchAvailableStudents } from '@/services/supabase.service';
 import { getAllGroups } from '@/services/group.service';
+import { supabase } from '@/lib/supabase';
 
-const BASE_STUDENTS = rawStudents as Student[];
+const BASE_STUDENTS = Array.isArray(rawStudents) ? (rawStudents as Student[]) : [];
 
 /**
  * Loads the full baseline roster: the read-only demo JSON merged with any
- * "I'm Looking For A Group" entries stored in Local Storage. Local entries
- * never overwrite the original JSON file.
+ * "I'm Looking For A Group" entries stored in Supabase.
  */
-export function loadBaselineStudents(): Student[] {
-  const localEntries = getLookingForGroup();
+export async function loadBaselineStudents(): Promise<Student[]> {
+  const localEntries = await fetchAvailableStudents();
   const baseEnrollments = new Set(BASE_STUDENTS.map((s) => s.enrollment));
   const newLocalEntries = localEntries.filter((s) => !baseEnrollments.has(s.enrollment));
   return [...BASE_STUDENTS, ...newLocalEntries];
 }
 
-/** Registers a student as "looking for a group" in Local Storage. */
-export function registerLookingForGroup(input: RegisterLookingForGroupInput): Student {
+/** Registers a student as "looking for a group" in Supabase. */
+export async function registerLookingForGroup(input: RegisterLookingForGroupInput): Promise<Student> {
   const enrollment = normalizeEnrollment(input.enrollment);
   
   // Rule 1: Check if already in a group
-  const allGroups = getAllGroups();
+  const allGroups = await getAllGroups();
   const groupMatch = allGroups.find(g => g.members.some(m => m.enrollment === enrollment));
   if (groupMatch) {
     throw new Error(`You are already registered as a member of Group ${groupMatch.groupNumber}. A student who is already part of a group cannot register as 'Looking for a Team'.`);
   }
 
   // Rule 2: Check if already in Available Students
-  const availableStudents = getLookingForGroup();
+  const availableStudents = await fetchAvailableStudents();
   if (availableStudents.some(s => s.enrollment === enrollment)) {
     throw new Error("You are already registered as Looking for a Team. If you have already found a team, remove yourself from the Available Students list before registering again.");
   }
 
-  const entry: Student = {
+  // Upsert the student record
+  await supabase.from('students').upsert({
+    enrollment,
+    full_name: input.name.trim(),
+    division: input.division,
+    specialization: input.specialization,
+  }, { onConflict: 'enrollment' });
+
+  // Insert into available_students
+  const { error } = await supabase.from('available_students').insert({
+    enrollment,
+    note: null,
+    safety_pin: input.pin,
+  });
+
+  if (error) {
+    console.error("Failed to register looking for group:", error);
+    throw new Error("Failed to register.");
+  }
+
+  return {
     enrollment,
     name: input.name.trim(),
     specialization: input.specialization,
@@ -45,20 +65,15 @@ export function registerLookingForGroup(input: RegisterLookingForGroupInput): St
     addedAt: new Date().toISOString(),
     pin: input.pin,
   };
-
-  const existing = availableStudents.filter((s) => s.enrollment !== enrollment);
-  setLookingForGroup([...existing, entry]);
-
-  return entry;
 }
 
 /** 
  * Returns the fully merged, deduplicated roster of all students across 
- * baseline, local storage availability, and group memberships.
+ * baseline, Supabase availability, and group memberships.
  */
-export function getMergedStudents(): Student[] {
-  const baseline = loadBaselineStudents();
-  const groups = getAllGroups();
+export async function getMergedStudents(): Promise<Student[]> {
+  const baseline = await loadBaselineStudents();
+  const groups = await getAllGroups();
   
   const studentMap = new Map<string, Student>();
   
@@ -93,17 +108,16 @@ export function isDuplicateEnrollment(
 }
 
 /** Removes a student from "looking for a group" if the provided PIN matches the stored PIN. */
-export function removeLookingForGroup(enrollment: string, pin: string): boolean {
+export async function removeLookingForGroup(enrollment: string, pin: string): Promise<boolean> {
   const normalized = normalizeEnrollment(enrollment);
-  const allStudents = getLookingForGroup();
+  const availableStudents = await fetchAvailableStudents();
   
-  const student = allStudents.find((s) => s.enrollment === normalized);
+  const student = availableStudents.find((s) => s.enrollment === normalized);
   if (!student) return false;
   if (student.pin !== pin) return false;
   
-  const remaining = allStudents.filter((s) => s.enrollment !== normalized);
-  setLookingForGroup(remaining);
-  return true;
+  const { error } = await supabase.from('available_students').delete().eq('enrollment', normalized);
+  return !error;
 }
 
 export type { DivisionCode, SpecializationCode };

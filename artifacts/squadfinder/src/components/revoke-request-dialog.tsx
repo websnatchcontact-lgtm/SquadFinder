@@ -25,7 +25,7 @@ export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeReque
   const { refresh: refreshStats } = useStatistics();
   const { toast } = useToast();
 
-  const handleRevoke = () => {
+  const handleRevoke = async () => {
     if (!request) return;
     
     if (pin !== request.pin) {
@@ -35,7 +35,7 @@ export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeReque
 
     setIsSubmitting(true);
     try {
-      revoke(request.groupNumber, request.id);
+      await revoke(request.groupNumber, request.id);
       refreshGroups();
       refreshStats();
       toast({
@@ -60,8 +60,8 @@ export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeReque
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[425px] w-[95vw] sm:w-full flex flex-col max-h-[90vh] md:max-h-[85vh] rounded-lg p-4 sm:p-6 overflow-hidden">
+        <DialogHeader className="shrink-0">
           <DialogTitle>Revoke Join Request</DialogTitle>
           <DialogDescription>
             Enter your Safety PIN to verify that you are the person who submitted this request.
@@ -75,7 +75,7 @@ export function RevokeRequestDialog({ request, open, onOpenChange }: RevokeReque
           </div>
         )}
 
-        <div className="space-y-4 py-2">
+        <div className="space-y-4 py-2 overflow-y-auto min-h-0">
           <Input
             type="password"
             placeholder="Enter your Safety PIN"

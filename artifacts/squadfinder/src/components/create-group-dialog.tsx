@@ -56,27 +56,27 @@ export function CreateGroupDialog({ open, onOpenChange }: { open: boolean, onOpe
     setMembers(updated);
   };
 
-  const validateAndSubmit = () => {
+  const validateAndSubmit = async () => {
     const input: CreateGroupInput = { creatorName, members };
-    const validation = validateCreate(input);
+    const validation = await validateCreate(input);
     if (!validation.valid) {
       setError(validation.message || "Invalid input");
       return;
     }
     setError(null);
     
-    const duplicates = checkCrossGroupDuplicates(input);
+    const duplicates = await checkCrossGroupDuplicates(input);
     if (duplicates.length > 0) {
       setConflictConfirmOpen(true);
     } else {
-      doSubmit();
+      await doSubmit();
     }
   };
 
-  const doSubmit = () => {
+  const doSubmit = async () => {
     const input: CreateGroupInput = { creatorName, members };
     try {
-      submitCreateGroup(input);
+      await submitCreateGroup(input);
       refreshGroups();
       refreshStats();
       refreshConflicts();
@@ -210,9 +210,13 @@ export function CreateGroupDialog({ open, onOpenChange }: { open: boolean, onOpe
       <AlertDialog open={conflictConfirmOpen} onOpenChange={setConflictConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Conflict Detected</AlertDialogTitle>
-            <AlertDialogDescription>
-              One or more students in this group already belong to another registered group. Continuing will create a conflict that will be visible on the dashboard.
+            <AlertDialogTitle>Potential Conflict Detected</AlertDialogTitle>
+            <AlertDialogDescription className="whitespace-pre-line">
+              This student already belongs to another group.
+
+              Creating this group will create a conflict that will be visible in the Conflict Center.
+              
+              Do you want to continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -221,7 +225,7 @@ export function CreateGroupDialog({ open, onOpenChange }: { open: boolean, onOpe
               setConflictConfirmOpen(false);
               doSubmit();
             }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Continue Anyway
+              Create Anyway
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

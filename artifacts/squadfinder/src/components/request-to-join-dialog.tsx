@@ -13,7 +13,7 @@ import { useStudents } from "@/hooks/use-students";
 import { useToast } from "@/hooks/use-toast";
 import { Group, RequestToJoinInput, DivisionCode, SpecializationCode } from "@/types";
 import { DIVISION_LIST, SPECIALIZATION_LIST } from "@/constants";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Group, open: boolean, onOpenChange: (open: boolean) => void }) {
@@ -26,6 +26,8 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
   const [error, setError] = useState<string | null>(null);
   const [conflictConfirmOpen, setConflictConfirmOpen] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { validateJoin, checkJoinDuplicate, submitRequestToJoin } = useGroupActions();
   const { refresh: refreshGroups } = useGroups();
   const { refresh: refreshStats } = useStatistics();
@@ -36,7 +38,7 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
   const registeredStudent = students.find(s => s.enrollment === enrollment && s.pin);
   const isRegistered = !!registeredStudent;
 
-  const validateAndSubmit = () => {
+  const validateAndSubmit = async () => {
     const finalPin = isRegistered ? registeredStudent.pin! : pin;
     if (!finalPin || finalPin.length < 4) {
       setError("Please enter a valid Safety PIN (at least 4 characters).");
@@ -44,25 +46,26 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
     }
     
     const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin: finalPin };
-    const validation = validateJoin(group, input);
+    const validation = await validateJoin(group, input);
     if (!validation.valid) {
       setError(validation.message || "Invalid input");
       return;
     }
     setError(null);
     
-    if (checkJoinDuplicate(enrollment)) {
+    if (await checkJoinDuplicate(enrollment)) {
       setConflictConfirmOpen(true);
     } else {
-      doSubmit();
+      await doSubmit();
     }
   };
 
-  const doSubmit = () => {
+  const doSubmit = async () => {
+    setIsSubmitting(true);
     const finalPin = isRegistered ? registeredStudent.pin! : pin;
     const input: RequestToJoinInput = { name, enrollment, division, specialization, note, pin: finalPin };
     try {
-      submitRequestToJoin(group.groupNumber, input);
+      await submitRequestToJoin(group.groupNumber, input);
       refreshGroups();
       refreshStats();
       refreshConflicts();
@@ -71,6 +74,8 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
       handleClose();
     } catch (err: any) {
       setError(err.message || "Failed to submit request");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -90,9 +95,9 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
   return (
     <>
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Request to Join {group.groupNumber}</DialogTitle>
+        <DialogContent className="sm:max-w-[425px] w-[95vw] sm:w-full flex flex-col max-h-[90vh] md:max-h-[85vh] rounded-lg p-4 sm:p-6 overflow-hidden">
+          <DialogHeader className="shrink-0">
+            <DialogTitle>Request to Join Group {group.groupNumber}</DialogTitle>
             <DialogDescription>
               Submit your details to request an open seat in this group.
             </DialogDescription>
@@ -105,7 +110,7 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
             </div>
           )}
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-4 py-2 overflow-y-auto min-h-0 pr-1">
             <div className="space-y-2">
               <Label>Full Name</Label>
               <Input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" autoFocus />
@@ -157,7 +162,10 @@ export function RequestToJoinDialog({ group, open, onOpenChange }: { group: Grou
                 </p>
               </div>
             )}
-            <Button onClick={validateAndSubmit} className="w-full mt-2">Submit Request</Button>
+            <Button onClick={validateAndSubmit} className="w-full mt-2" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Submit Request
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

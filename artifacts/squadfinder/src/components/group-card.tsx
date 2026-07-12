@@ -18,7 +18,7 @@ export function GroupCard({ group, onClick, className }: { group: Group; onClick
     >
       <CardHeader className="p-5 pb-4 flex flex-row items-start justify-between space-y-0">
         <div className="flex flex-col gap-1">
-          <h3 className="font-bold text-lg tracking-tight">{groupNumber}</h3>
+          <h3 className="font-bold text-lg tracking-tight">Group {groupNumber}</h3>
           <div className="flex items-center text-sm text-muted-foreground font-medium">
             <Users className="w-4 h-4 mr-1.5" />
             {totalMembers} member{totalMembers !== 1 ? 's' : ''}

@@ -7,10 +7,10 @@ import { getConflicts } from '@/services/conflict.service';
  * Every dashboard statistic is derived from a single pass over the current
  * roster and group list -- never duplicated loops through the dataset.
  */
-export function calculateDashboardStatistics(): DashboardStats {
-  const students = getMergedStudents();
-  const groups = getAllGroups();
-  const conflicts = getConflicts();
+export async function calculateDashboardStatistics(): Promise<DashboardStats> {
+  const students = await getMergedStudents();
+  const groups = await getAllGroups();
+  const conflicts = await getConflicts();
 
   let studentsInGroups = 0;
   let studentsLooking = 0;

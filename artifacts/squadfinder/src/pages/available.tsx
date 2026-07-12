@@ -28,10 +28,10 @@ export default function Available() {
   const [removePin, setRemovePin] = useState("");
   const [removeError, setRemoveError] = useState<string | null>(null);
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (!selectedStudentToRemove) return;
     setRemoveError(null);
-    const success = remove(selectedStudentToRemove.enrollment, removePin);
+    const success = await remove(selectedStudentToRemove.enrollment, removePin);
     if (success) {
       toast({ title: "You have been removed from the Available Students list." });
       refresh();

@@ -8,60 +8,53 @@ import {
   revokeRequest,
   updateGroupNotes,
   validateCreateGroupInput,
-  validateRequestToJoin,
+  validateRequestToJoinStrict,
 } from '@/services/group.service';
 import type { CreateGroupInput, Group, RequestToJoinInput, ValidationResult } from '@/types';
 
-/**
- * Every mutation that touches a group (create, join request, confirmation,
- * notes) lives behind this hook. Callers should call the returned `refresh`
- * callbacks from `useGroups`/`useGroup`/`useStatistics`/`useConflicts` after
- * any of these succeed so the whole UI stays in sync -- no page refresh ever
- * needed.
- */
 export function useGroupActions() {
-  const validateCreate = useCallback((input: CreateGroupInput): ValidationResult => {
+  const validateCreate = useCallback(async (input: CreateGroupInput): Promise<ValidationResult> => {
     return validateCreateGroupInput(input);
   }, []);
 
-  const checkCrossGroupDuplicates = useCallback((input: CreateGroupInput): string[] => {
+  const checkCrossGroupDuplicates = useCallback(async (input: CreateGroupInput): Promise<string[]> => {
     return findCrossGroupDuplicates(input.members);
   }, []);
 
-  const submitCreateGroup = useCallback((input: CreateGroupInput): Group => {
+  const submitCreateGroup = useCallback(async (input: CreateGroupInput): Promise<Group> => {
     return createGroup(input);
   }, []);
 
   const validateJoin = useCallback(
-    (group: Group, input: RequestToJoinInput): ValidationResult => {
-      return validateRequestToJoin(group, input);
+    async (group: Group, input: RequestToJoinInput) => {
+      return validateRequestToJoinStrict(group, input);
     },
     [],
   );
 
-  const checkJoinDuplicate = useCallback((enrollment: string): boolean => {
-    return findCrossGroupDuplicates([{ enrollment }]).length > 0;
+  const checkJoinDuplicate = useCallback(async (enrollment: string): Promise<boolean> => {
+    const duplicates = await findCrossGroupDuplicates([{ enrollment }]);
+    return duplicates.length > 0;
   }, []);
 
   const submitRequestToJoin = useCallback(
-    (groupNumber: string, input: RequestToJoinInput) => {
+    async (groupNumber: number, input: RequestToJoinInput) => {
       return requestToJoin(groupNumber, input);
     },
     [],
   );
 
-  const confirm = useCallback((groupNumber: string, enrollment: string) => {
-    confirmMembership(groupNumber, enrollment);
+  const confirm = useCallback(async (groupNumber: number, enrollment: string) => {
+    return confirmMembership(groupNumber, enrollment);
   }, []);
 
-  const saveNotes = useCallback((groupNumber: string, notes: string) => {
-    updateGroupNotes(groupNumber, notes);
+  const saveNotes = useCallback(async (groupNumber: number, notes: string) => {
+    return updateGroupNotes(groupNumber, notes);
   }, []);
 
-  const revoke = useCallback((groupNumber: string, requestId: string) => {
-    revokeRequest(groupNumber, requestId);
+  const revoke = useCallback(async (groupNumber: number, requestId: string) => {
+    return revokeRequest(groupNumber, requestId);
   }, []);
-
 
   return {
     validateCreate,

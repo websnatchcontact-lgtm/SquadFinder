@@ -65,7 +65,7 @@ export default function RequestsPage() {
                       <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1 flex items-center gap-1">
                         <Hash className="w-3 h-3" /> Requested Group
                       </span>
-                      <span className="font-medium">{req.groupNumber}</span>
+                      <span className="font-medium">Group {req.groupNumber}</span>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1 flex items-center gap-1">
@@ -79,7 +79,7 @@ export default function RequestsPage() {
                       <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1 flex items-center gap-1">
                         <Hash className="w-3 h-3" /> Group Number
                       </span>
-                      <span className="font-medium">{req.groupNumber}</span>
+                      <span className="font-medium">Group {req.groupNumber}</span>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1 flex items-center gap-1">

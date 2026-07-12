@@ -3,8 +3,9 @@ import { detectConflicts } from '@/utils/conflicts';
 import { getAllGroups } from '@/services/group.service';
 
 /** Every conflict currently visible across the whole application. */
-export function getConflicts(): ConflictRecord[] {
-  return detectConflicts(getAllGroups());
+export async function getConflicts(): Promise<ConflictRecord[]> {
+  const groups = await getAllGroups();
+  return detectConflicts(groups);
 }
 
 export function getConflictsForGroup(group: Group, conflicts: ConflictRecord[]): ConflictRecord[] {

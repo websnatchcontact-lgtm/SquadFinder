@@ -59,10 +59,10 @@ export default function SearchPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setRegisterError(null);
-      register(values);
+      await register(values);
       refreshStudents();
       toast({
         title: "Successfully registered!",
@@ -76,14 +76,14 @@ export default function SearchPage() {
     }
   }
 
-  const handleConfirmMembership = () => {
+  const handleConfirmMembership = async () => {
     if (studentMatch && fullGroup) {
-      confirm(fullGroup.groupNumber, studentMatch.enrollment);
+      await confirm(fullGroup.groupNumber, studentMatch.enrollment);
       refreshGroup();
       refreshStudents();
       toast({
         title: "Membership Confirmed",
-        description: `You are now confirmed in ${fullGroup.groupNumber}`,
+        description: `You are now confirmed in Group ${fullGroup.groupNumber}`,
       });
     }
   };
@@ -357,7 +357,10 @@ export default function SearchPage() {
                 )}
               />
               <div className="pt-4 flex justify-end">
-                <Button type="submit" className="w-full">Register Availability</Button>
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Register Availability
+                </Button>
               </div>
             </form>
           </Form>

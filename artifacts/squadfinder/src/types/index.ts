@@ -23,7 +23,7 @@ export interface Student {
   name: string;
   specialization: SpecializationCode;
   division: DivisionCode;
-  group: string | null;
+  group: number | null;
   status: StudentStatus;
   /** Present only for students added via "I'm Looking For A Group" (Local Storage). */
   addedAt?: string;
@@ -34,7 +34,7 @@ export interface Student {
 /** A pending request to join a group. Never auto-accepted -- informational only. */
 export interface JoinRequest {
   id: string;
-  groupNumber: string;
+  groupNumber: number;
   name: string;
   enrollment: string;
   division: DivisionCode;
@@ -59,7 +59,7 @@ export type GroupHealth = 'healthy' | 'pending' | 'conflict';
 
 /** A fully-derived group, merged from demo data and/or Local Storage overlays. */
 export interface Group {
-  groupNumber: string;
+  groupNumber: number;
   source: 'demo' | 'local';
   specialization: SpecializationCode;
   createdBy: string | null;
@@ -78,7 +78,7 @@ export interface Group {
 
 /** A student whose enrollment number appears in more than one group. */
 export interface ConflictAppearance {
-  groupNumber: string;
+  groupNumber: number;
   createdBy: string | null;
   createdAt: string | null;
 }
