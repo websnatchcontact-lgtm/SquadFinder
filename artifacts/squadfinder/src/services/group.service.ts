@@ -37,6 +37,18 @@ export async function validateCreateGroupInput(input: CreateGroupInput): Promise
   const availableStudents = await fetchAvailableStudents();
   
   const allGroups = await fetchAllGroups();
+  
+  // BUSINESS RULE: A student can create ONLY ONE group.
+  const creatorEnrollment = normalizeEnrollment(validatedInput.members[0].enrollment);
+  const hasCreatedGroup = allGroups.some((g) => g.creatorEnrollment === creatorEnrollment);
+
+  if (hasCreatedGroup) {
+    return {
+      valid: false,
+      message: 'You have already created a group. A student can create only one group.',
+    };
+  }
+
   const existingEnrollments = new Set(
     allGroups.flatMap((g) => g.members.map((m) => m.enrollment)),
   );
@@ -93,59 +105,31 @@ export async function findCrossGroupDuplicates(members: { enrollment: string }[]
 /** Creates a new group and persists it to Supabase. */
 export async function createGroup(input: CreateGroupInput): Promise<Group> {
   const creatorName = input.creatorName.trim();
+  const creatorEnrollment = normalizeEnrollment(input.members[0].enrollment);
   
-  // 1. Insert Group
-  const { data: groupData, error: groupError } = await supabase
-    .from('groups')
-    .insert({ creator_name: creatorName })
-    .select('id, group_number')
-    .single();
-
-  if (groupError || !groupData) {
-    console.error('Failed to create group:', groupError?.message || groupError);
-    throw new Error('Failed to create group.');
-  }
-
-  const groupId = groupData.id;
-  const groupNumber = groupData.group_number;
-
-  // 2. Upsert Students
-  for (const member of input.members) {
-    const normalizedEnrollment = normalizeEnrollment(member.enrollment);
-    
-    // Attempt upsert (only updates name, division, specialization)
-    // Note: The prompt asks me to implement standard Supabase, so I'll just use standard upsert
-    // This depends on Supabase constraints, assuming enrollment is UNIQUE.
-    const { error: upsertError } = await supabase.from('students').upsert({
-      enrollment: normalizedEnrollment,
-      full_name: member.name.trim(),
-      division: member.division,
-      specialization: member.specialization,
-    }, { onConflict: 'enrollment' });
-
-    if (upsertError) {
-      console.error('Failed to upsert student:', upsertError.message || upsertError);
-      throw new Error(`Failed to save student ${normalizedEnrollment}: ${upsertError.message}`);
-    }
-  }
-
-  // 3. Insert Group Members
-  const membersToInsert = input.members.map((m, index) => ({
-    group_id: groupId,
+  const membersPayload = input.members.map((m, index) => ({
+    name: m.name.trim(),
     enrollment: normalizeEnrollment(m.enrollment),
+    division: m.division,
+    specialization: m.specialization,
     confirmed: index === 0, // creator is automatically confirmed
   }));
 
-  const { error: membersError } = await supabase
-    .from('group_members')
-    .insert(membersToInsert);
+  const { data, error } = await supabase.rpc('create_group_atomic', {
+    p_creator_name: creatorName,
+    p_creator_enrollment: creatorEnrollment,
+    p_members: membersPayload
+  });
 
-  if (membersError) {
-    console.error('Failed to add members:', membersError.message || membersError);
-    throw new Error(`Failed to add group members: ${membersError.message}`);
+  if (error) {
+    console.error('Failed to create group:', error.message || error);
+    if (error.message.includes('create only one group')) {
+      throw new Error('You have already created a group. A student can create only one group.');
+    }
+    throw new Error(`Failed to create group: ${error.message}`);
   }
 
-  const newGroup = await getGroup(groupNumber);
+  const newGroup = await getGroup(data.group_number);
   if (!newGroup) throw new Error("Could not retrieve newly created group.");
   return newGroup;
 }

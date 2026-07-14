@@ -60,6 +60,7 @@ export interface Group {
   source: 'demo' | 'local';
   specialization: SpecializationCode;
   createdBy: string | null;
+  creatorEnrollment: string | null;
   createdAt: string | null;
   members: GroupMember[];
   notes: string;

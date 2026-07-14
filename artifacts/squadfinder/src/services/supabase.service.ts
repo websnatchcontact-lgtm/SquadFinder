@@ -5,7 +5,7 @@ import { detectConflicts, countGroupConflicts } from '@/utils/conflicts';
 
 export async function fetchAllGroups(): Promise<Group[]> {
   const { data, error } = await supabase.from('groups').select(`
-    id, group_number, created_at, notes, creator_name,
+    id, group_number, created_at, notes, creator_name, creator_enrollment,
     group_members (
       id, enrollment, confirmed, created_at,
       students ( full_name, division, specialization )
@@ -33,7 +33,7 @@ export async function fetchAllGroups(): Promise<Group[]> {
       division: (m.students?.division as DivisionCode) || 'A',
       specialization: (m.students?.specialization as SpecializationCode) || 'CS',
       confirmed: m.confirmed,
-      isCreator: index === 0, // Assume first member is the creator
+      isCreator: m.enrollment === g.creator_enrollment,
     }));
 
     const requests: JoinRequest[] = g.join_requests
@@ -57,11 +57,14 @@ export async function fetchAllGroups(): Promise<Group[]> {
       divisionCounts[member.division] = (divisionCounts[member.division] ?? 0) + 1;
     }
 
+    const creator = members.find(m => m.isCreator) || members[0];
+
     return {
       groupNumber: g.group_number,
       source: 'local',
-      specialization: members.length > 0 ? members[0].specialization : 'CS',
+      specialization: creator ? creator.specialization : 'CS',
       createdBy: g.creator_name,
+      creatorEnrollment: g.creator_enrollment || null,
       createdAt: g.created_at,
       members,
       notes: g.notes || '',
